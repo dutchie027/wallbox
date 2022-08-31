@@ -116,7 +116,6 @@ class Wallbox
 
     /**
      * URI for Acting on a charger
-     * NOTE: This is a v2 URI and uses PUT vs GET
      *
      * @const string
      */
@@ -249,10 +248,8 @@ class Wallbox
     /**
      * getLogLocation
      * Alias to Get Log Path
-     *
-     * @return string
      */
-    public function getLogLocation()
+    public function getLogLocation(): string
     {
         return $this->pGetLogPath();
     }
@@ -260,10 +257,8 @@ class Wallbox
     /**
      * getStatusName
      * Returns the name of the status associated with the ID
-     *
-     * @return string
      */
-    public function getStatusName($id)
+    public function getStatusName($id): string
     {
         return self::STATUS_LOOKUP[$id];
     }
@@ -272,41 +267,41 @@ class Wallbox
      * getStatusName
      * Returns the name of the status associated with the ID
      *
-     * @return string
+     * @param int $id
      */
-    public function checkFirmwareStatus($id)
+    public function checkFirmwareStatus($id): string
     {
         $chargerConfig = json_decode($this->getChargerStatus($id));
         $cv = $chargerConfig->config_data->software->currentVersion;
         $lv = $chargerConfig->config_data->software->latestVersion;
         $ua = $chargerConfig->config_data->software->updateAvailable;
+
         if ($cv == $lv && !$ua) {
-            return "Firmware up to date";
-        } else {
-            return "Firmware needs updated";
+            return 'Firmware up to date';
         }
+
+        return 'Firmware needs updated';
     }
 
     /**
      * getStatusName
      * Returns the name of the status associated with the ID
      *
-     * @return string
+     * @param int $id
      */
-    public function checkLock($id)
+    public function checkLock($id): bool
     {
         $chargerConfig = json_decode($this->getChargerStatus($id));
         $locked = $chargerConfig->config_data->locked;
+
         return $locked == 1 ? true : false;
     }
 
     /**
      * getJWTToken
      * Returns the stored JWT Token
-     *
-     * @return string
      */
-    protected function getJWTToken()
+    protected function getJWTToken(): string
     {
         return $this->p_jwt;
     }
@@ -314,52 +309,63 @@ class Wallbox
     /**
      * getLogPointer
      * Returns a referencd to the logger
-     *
-     * @return object
      */
-    public function getLogPointer()
+    public function getLogPointer(): string
     {
         return $this->p_log;
     }
 
-    public function getStats($id, $start, $end)
+    /**
+     * getStats
+     * Calls Stats URI and gets data between start and end
+     *
+     * @param int $id
+     * @param int $start
+     * @param int $end
+     */
+    public function getStats($id, $start, $end): string
     {
         $payload = [
             'charger' => $id,
             'start_date' => $start,
-            'end_date' => $end
+            'end_date' => $end,
         ];
         $httpPayload = http_build_query($payload);
 
-        $URL = self::API_URL . self::SESSION_LIST_URI . "?" . $httpPayload;
+        $URL = self::API_URL . self::SESSION_LIST_URI . '?' . $httpPayload;
+
         return $this->makeAPICall('GET', $URL);
     }
 
-    public function getChargerStatus($id)
+    /**
+     * getChargerStatus
+     * Returns full data about charger
+     *
+     * @param int $id
+     */
+    public function getChargerStatus($id): string
     {
         $URL = self::API_URL . self::CHARGER_STATUS_URI . $id;
+
         return $this->makeAPICall('GET', $URL);
     }
 
     /**
      * pGetLogPath
      * Returns full path and name of the log file
-     *
-     * @return string
      */
-    protected function pGetLogPath()
+    protected function pGetLogPath(): string
     {
         return $this->p_log_location . '/' . $this->p_log_name;
     }
 
     /**
      * getFullPayload
-     *
-     * @return string
      */
-    public function getFullPayload()
+    public function getFullPayload(): string
     {
         $URL = self::API_URL . self::LIST_URI;
+
         return $this->makeAPICall('GET', $URL);
     }
 
@@ -367,9 +373,9 @@ class Wallbox
      * setHeaders
      * Sets the headers using the API Token
      *
-     * @return array
+     * @param bool $bearer
      */
-    public function setHeaders($bearer = true)
+    public function setHeaders($bearer = true): array
     {
         $array = [
             'User-Agent' => 'php-api-dutchie027/' . self::LIBRARY_VERSION,
@@ -387,47 +393,81 @@ class Wallbox
         return $array;
     }
 
-    private function usernamePasswordAuth()
+    /**
+     * usernamePasswordAuth
+     */
+    private function usernamePasswordAuth(): void
     {
         $authURL = self::API_LOGIN . self::AUTH_URI;
         $this->p_jwt = json_decode($this->makeAPICall('GET', $authURL, false))->data->attributes->token;
     }
 
+    /**
+     * getLastChargeDuration
+     */
     public function getLastChargeDuration()
     {
         $data = json_decode($this->getFullPayload(), true);
+
         return $this->convertSeconds($data['result']['groups'][0]['chargers'][0]['chargingTime']);
     }
 
-    public function unlockCharger($id)
+    /**
+     * unlockCharger
+     *
+     * @param int $id
+     */
+    public function unlockCharger($id): void
     {
         $URL = self::API_URL . self::CHARGER_ACTION_URI . $id;
         $body = '{"locked":0}';
-        return $this->makeAPICall('PUT', $URL, true, $body);
+        $this->makeAPICall('PUT', $URL, true, $body);
     }
 
-    public function lockCharger($id)
+    /**
+     * lockCharger
+     *
+     * @param int $id
+     */
+    public function lockCharger($id): void
     {
         $URL = self::API_URL . self::CHARGER_ACTION_URI . $id;
         $body = '{"locked":1}';
-        return $this->makeAPICall('PUT', $URL, true, $body);
+        $this->makeAPICall('PUT', $URL, true, $body);
     }
 
-    public function getChargerData($id)
+    /**
+     * getChargerData
+
+     *
+     * @param int $id
+     */
+    public function getChargerData($id): string
     {
         $URL = self::API_URL . self::CHARGER_ACTION_URI . $id;
+
         return $this->makeAPICall('GET', $URL);
     }
 
-    public function getTotalChargeTime($id)
+    /**
+     * getTotalChargeTime
+     *
+     * @param int $id
+     */
+    public function getTotalChargeTime($id): string
     {
         $data = json_decode($this->getChargerData($id));
+
         return $this->convertSeconds($data->data->chargerData->resume->chargingTime);
     }
 
-    public function getTotalSessions($id)
+    /**
+     * getTotalSessions
+     */
+    public function getTotalSessions($id): string
     {
         $data = json_decode($this->getChargerData($id));
+
         return $data->data->chargerData->resume->totalSessions;
     }
 
@@ -436,10 +476,8 @@ class Wallbox
      * Generates a random string of $length
      *
      * @param int $length
-     *
-     * @return string
      */
-    public function pGenRandomString($length = 6)
+    public function pGenRandomString($length = 6): string
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
@@ -462,9 +500,8 @@ class Wallbox
      *
      * @throws WallboxAPIRequestException Exception with details regarding the failed request
      *
-     * @return Psr7\Stream Object
      */
-    public function makeAPICall($type, $url, $token = true, $body = null)
+    public function makeAPICall($type, $url, $token = true, $body = null): string
     {
         $data['headers'] = $this->setHeaders($token);
         $data['body'] = $body;
@@ -485,11 +522,16 @@ class Wallbox
         }
     }
 
-    public function convertSeconds($seconds)
+    /**
+     * convertSeconds
+     * Returns a referencd to the logger
+     */
+    public function convertSeconds($seconds): string
     {
         $hours = floor($seconds / 3600);
         $minutes = floor(($seconds / 60) % 60);
         $seconds = $seconds % 60;
+
         return $hours > 0 ? "{$hours}h {$minutes}m" : ($minutes > 0 ? "{$minutes}m {$seconds}s" : "{$seconds}s");
     }
 }
