@@ -1,0 +1,99 @@
+stdClass Object
+(
+    [result] => stdClass Object
+        (
+            [groups] => Array
+                (
+                    [0] => stdClass Object
+                        (
+                            [id] => 123456
+                            [uid] => 123e4567-e89b-12d3-a456-426614174000
+                            [parent] => 
+                            [name] => Family
+                            [profile] => stdClass Object
+                                (
+                                    [id] => 4
+                                    [name] => super-admin
+                                )
+
+                            [currency] => 1
+                            [energyPrice] => 0.2
+                            [chargers] => Array
+                                (
+                                    [0] => stdClass Object
+                                        (
+                                            [id] => 123456
+                                            [uid] => 1234567890ABCDEF9876543210
+                                            [access] => 1
+                                            [name] => My Charger
+                                            [status] => 209
+                                            [chargerType] => Pulsar Plus US
+                                            [ocppReady] => ocpp_1.6j
+                                            [ocppConnectionStatus] => 1
+                                            [connectionType] => wifi
+                                            [locked] => 1
+                                            [maxChargingCurrent] => 32
+                                            [addedEnergy] => 6.857
+                                            [chargingPower] => 0
+                                            [chargingTime] => 4028
+                                            [energyUnit] => kWh
+                                            [powerUnit] => kW
+                                            [image] => https://api.wall-box.com/uploads/PUP1-U-1-5-N-002-A.png
+                                            [lastConnection] => 1661982622
+                                            [lastSync] => 1661902585
+                                            [wifiSignal] => 100
+                                            [chargerLoadType] => Private
+                                            [currency] => 1
+                                            [energyPrice] => 0.077
+                                            [energyCost] => stdClass Object
+                                                (
+                                                    [value] => 0.077
+                                                    [inheritedGroupId] => 
+                                                )
+
+                                            [remoteAction] => 0
+                                            [software] => stdClass Object
+                                                (
+                                                    [updateAvailable] => 
+                                                    [currentVersion] => 5.11.14
+                                                    [latestVersion] => 5.11.14
+                                                    [fileName] => pup1.tar
+                                                )
+
+                                            [midStatus] => 0
+                                            [midEnabled] => 
+                                            [country] => US
+                                            [state] => GA
+                                            [operationMode] => wallbox
+                                        )
+
+                                )
+
+                            [payments_account] => 
+                            [plan] => stdClass Object
+                                (
+                                    [id] => 1
+                                    [product_id] => 1
+                                    [name] => Basic
+                                    [description] => 
+                                    [features] => Array
+                                        (
+                                            [0] => DEFAULT_FEATURE
+                                            [1] => POWER_BOOST
+                                            [2] => MOBILE_CONNECTIVITY
+                                            [3] => AUTOMATIC_REPORTING
+                                            [4] => STATISTICS
+                                        )
+
+                                )
+
+                            [billingInformation] => 
+                            [customer] => 
+                            [subscription] => 
+                        )
+
+                )
+
+        )
+
+)

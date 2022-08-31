@@ -1,0 +1,62 @@
+{
+  "data": {
+    "chargerData": {
+      "id": 123456,
+      "uid": "1234567890ABCDEF9876543210",
+      "serialNumber": "123456",
+      "name": "My Charger",
+      "group": 123456,
+      "groupUid": "123e4567-e89b-12d3-a456-426614174000",
+      "chargerType": "Pulsar Plus US",
+      "softwareVersion": "5.11.14",
+      "status": 161,
+      "ocppConnectionStatus": 1,
+      "ocppReady": "ocpp_1.6j",
+      "stateOfCharge": null,
+      "maxChgCurrent": 32,
+      "maxAvailableCurrent": 40,
+      "maxChargingCurrent": 32,
+      "locked": 0,
+      "lastConnection": 1661985484,
+      "lastSync": {
+        "date": "2022-08-30 23:36:25.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+      },
+      "midEnabled": 0,
+      "midMargin": 1,
+      "midMarginUnit": 1,
+      "midSerialNumber": "",
+      "midStatus": 0,
+      "wifiSignal": 100,
+      "connectionType": "wifi",
+      "chargerLoadName": "Private",
+      "chargerLoadId": 2,
+      "chargingType": "AC",
+      "connectorType": "Type 1",
+      "protocolCommunication": "wifi",
+      "accessType": "guest",
+      "powerSharingStatus": 0,
+      "resume": {
+        "totalUsers": 1,
+        "totalSessions": 7,
+        "chargingTime": "31032",
+        "totalEnergy": "56677",
+        "totalMidEnergy": "0",
+        "energyUnit": "kWh"
+      }
+    },
+    "users": [
+      {
+        "id": 123456,
+        "avatar": null,
+        "name": "Bob",
+        "surname": "Jones",
+        "email": "bob@jones.com",
+        "profile": "super-admin",
+        "assigned": true,
+        "createdByUser": false
+      }
+    ]
+  }
+}

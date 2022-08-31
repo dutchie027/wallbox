@@ -1,0 +1,137 @@
+stdClass Object
+(
+    [user_id] => 1
+    [user_name] => default
+    [car_id] => 1
+    [car_plate] => 
+    [depot_price] => 0.2
+    [last_sync] => 2022-08-31 21:18:00
+    [power_sharing_status] => 0
+    [mid_status] => 0
+    [status_id] => 209
+    [name] => My Name
+    [charging_power] => 0
+    [max_available_power] => 40
+    [depot_name] => Family
+    [charging_speed] => 0
+    [added_range] => 57
+    [added_energy] => 6.857
+    [added_green_energy] => 0
+    [added_discharged_energy] => 0
+    [charging_time] => 85072
+    [finished] => 
+    [cost] => 0
+    [current_mode] => 1
+    [preventive_discharge] => 
+    [state_of_charge] => 
+    [ocpp_status] => 1
+    [config_data] => stdClass Object
+        (
+            [charger_id] => 123456
+            [uid] => 1234567890ABCDEF9876543210
+            [serial_number] => 123456
+            [name] => My Name
+            [locked] => 1
+            [auto_lock] => 0
+            [auto_lock_time] => 60
+            [multiuser] => 0
+            [max_charging_current] => 32
+            [language] => EN
+            [icp_max_current] => 0
+            [grid_type] => 0
+            [energy_price] => 0.077
+            [energyCost] => stdClass Object
+                (
+                    [value] => 0.077
+                    [inheritedGroupId] => 
+                )
+
+            [unlock_user_id] => 123456
+            [power_sharing_config] => 256
+            [purchased_power] => 0
+            [show_name] => 1
+            [show_lastname] => 1
+            [show_email] => 1
+            [show_profile] => 1
+            [show_default_user] => 1
+            [gesture_status] => 7
+            [home_sharing] => 0
+            [dca_status] => 0
+            [connection_type] => 1
+            [max_available_current] => 40
+            [live_refresh_time] => 30
+            [update_refresh_time] => 300
+            [owner_id] => 123456
+            [remote_action] => 0
+            [rfid_type] => 
+            [charger_has_image] => 0
+            [sha256_charger_image] => 
+            [plan] => stdClass Object
+                (
+                    [plan_name] => Basic
+                    [features] => Array
+                        (
+                            [0] => DEFAULT_FEATURE
+                            [1] => POWER_BOOST
+                            [2] => MOBILE_CONNECTIVITY
+                            [3] => AUTOMATIC_REPORTING
+                            [4] => STATISTICS
+                        )
+
+                )
+
+            [sync_timestamp] => 1661980676
+            [currency] => stdClass Object
+                (
+                    [id] => 148
+                    [name] => United States Dollar
+                    [symbol] => $
+                    [code] => USD
+                )
+
+            [charger_load_type] => Private
+            [contract_charging_available] => 
+            [country] => stdClass Object
+                (
+                    [id] => 75
+                    [code] => USA
+                    [iso2] => US
+                    [name] => ESTADOS UNIDOS
+                    [phone_code] => 1
+                )
+
+            [state] => stdClass Object
+                (
+                    [id] => 55
+                    [code] => GA
+                    [name] => Georgia
+                )
+
+            [timezone] => America/New_York
+            [part_number] => PUP1-U-1-5-N-002-A
+            [software] => stdClass Object
+                (
+                    [updateAvailable] => 
+                    [currentVersion] => 5.11.14
+                    [latestVersion] => 5.11.14
+                    [fileName] => pup1.tar
+                )
+
+            [available] => 1
+            [operation_mode] => wallbox
+            [ocpp_ready] => ocpp_1.6j
+            [tariffs] => Array
+                (
+                )
+
+            [mid_enabled] => 0
+            [mid_margin] => 1
+            [mid_margin_unit] => 1
+            [mid_serial_number] => 
+            [mid_status] => 0
+            [session_segment_length] => 0
+            [group_id] => 123456
+            [user_socket_locking] => 0
+        )
+
+)
