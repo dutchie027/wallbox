@@ -27,7 +27,7 @@ class Wallbox
      *
      * @const string
      */
-    protected const LIBRARY_VERSION = '0.5.0';
+    protected const LIBRARY_VERSION = '0.1.0';
 
     /**
      * Status IDs
@@ -84,12 +84,14 @@ class Wallbox
      * @const string
      */
     protected const LEGACY_AUTH_URI = '/auth/token/user';
+
     /**
      * URI for new Auth against new login URL
      *
      * @const string
      */
     protected const AUTH_URI = '/users/signin';
+
     /**
      * URI for Listing/Querying Data
      *
@@ -267,6 +269,38 @@ class Wallbox
     }
 
     /**
+     * getStatusName
+     * Returns the name of the status associated with the ID
+     *
+     * @return string
+     */
+    public function checkFirmwareStatus($id)
+    {
+        $chargerConfig = json_decode($this->getChargerStatus($id));
+        $cv = $chargerConfig->config_data->software->currentVersion;
+        $lv = $chargerConfig->config_data->software->latestVersion;
+        $ua = $chargerConfig->config_data->software->updateAvailable;
+        if ($cv == $lv && !$ua) {
+            return "Firmware up to date";
+        } else {
+            return "Firmware needs updated";
+        }
+    }
+
+    /**
+     * getStatusName
+     * Returns the name of the status associated with the ID
+     *
+     * @return string
+     */
+    public function checkLock($id)
+    {
+        $chargerConfig = json_decode($this->getChargerStatus($id));
+        $locked = $chargerConfig->config_data->locked;
+        return $locked == 1 ? true : false;
+    }
+
+    /**
      * getJWTToken
      * Returns the stored JWT Token
      *
@@ -326,7 +360,6 @@ class Wallbox
     public function getFullPayload()
     {
         $URL = self::API_URL . self::LIST_URI;
-
         return $this->makeAPICall('GET', $URL);
     }
 
@@ -358,6 +391,44 @@ class Wallbox
     {
         $authURL = self::API_LOGIN . self::AUTH_URI;
         $this->p_jwt = json_decode($this->makeAPICall('GET', $authURL, false))->data->attributes->token;
+    }
+
+    public function getLastChargeDuration()
+    {
+        $data = json_decode($this->getFullPayload(), true);
+        return $this->convertSeconds($data['result']['groups'][0]['chargers'][0]['chargingTime']);
+    }
+
+    public function unlockCharger($id)
+    {
+        $URL = self::API_URL . self::CHARGER_ACTION_URI . $id;
+        $body = '{"locked":0}';
+        return $this->makeAPICall('PUT', $URL, true, $body);
+    }
+
+    public function lockCharger($id)
+    {
+        $URL = self::API_URL . self::CHARGER_ACTION_URI . $id;
+        $body = '{"locked":1}';
+        return $this->makeAPICall('PUT', $URL, true, $body);
+    }
+
+    public function getChargerData($id)
+    {
+        $URL = self::API_URL . self::CHARGER_ACTION_URI . $id;
+        return $this->makeAPICall('GET', $URL);
+    }
+
+    public function getTotalChargeTime($id)
+    {
+        $data = json_decode($this->getChargerData($id));
+        return $this->convertSeconds($data->data->chargerData->resume->chargingTime);
+    }
+
+    public function getTotalSessions($id)
+    {
+        $data = json_decode($this->getChargerData($id));
+        return $data->data->chargerData->resume->totalSessions;
     }
 
     /**
