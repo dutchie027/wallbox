@@ -12,15 +12,18 @@
         "Composer",
         "System Administration"
     ],
-    "authors": [{
-        "name": "Justin Rodino",
-        "email": "justin@rodino.dev"
-    }],
+    "authors": [
+        {
+            "name": "Justin Rodino",
+            "email": "justin@rodino.dev"
+        }
+    ],
     "require": {
         "php": ">=8.1",
         "monolog/monolog": "^3.0",
         "guzzlehttp/guzzle": "^7.5",
-        "vlucas/phpdotenv": "^5.4"
+        "vlucas/phpdotenv": "^5.4",
+        "serhiy/pushover": "^1.1"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
