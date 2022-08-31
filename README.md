@@ -25,7 +25,6 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
 
 $wallbox = new dutchie027\Wallbox\Wallbox($_ENV['API_USERNAME'], $_ENV['API_PASSWORD']);
-$data = json_decode($wallbox->getFullPayload(), true);
 ...
 ```
 ### Functions
