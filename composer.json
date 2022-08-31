@@ -1,0 +1,66 @@
+{
+    "name": "dutchie027/wallbox",
+    "description": "This library calls on the Wallbox API to get information about the EV statistics from their charger",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "Wallbox",
+        "Electric Vehicle",
+        "Statistics",
+        "Charger",
+        "PHP",
+        "Composer",
+        "System Administration"
+    ],
+    "authors": [{
+        "name": "Justin Rodino",
+        "email": "justin@rodino.dev"
+    }],
+    "require": {
+        "php": ">=8.1",
+        "monolog/monolog": "^3.0",
+        "guzzlehttp/guzzle": "^7.5",
+        "vlucas/phpdotenv": "^5.4"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "dutchie027\\Wallbox\\": "src/"
+        }
+    },
+    "support": {
+        "forum": "https://github.com/dutchie027/wallbox-api/discussions",
+        "issues": "https://github.com/dutchie027/wallbox-api/issues",
+        "source": "https://github.com/dutchie027/wallbox-api/tree/main"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "dutchie027\\Test\\Wallbox\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.8",
+        "phpstan/phpstan": "^1.5",
+        "phpunit/phpunit": "^9"
+    },
+    "scripts": {
+        "fix": "./vendor/bin/php-cs-fixer fix",
+        "test": "./vendor/bin/phpunit",
+        "stan": "./vendor/bin/phpstan --no-progress",
+        "runall": [
+            "@fix",
+            "@test",
+            "@stan"
+        ]
+    },
+    "scripts-descriptions": {
+        "test": "Runs phpunit tests",
+        "fix": "Runs PHP-CS Fixer",
+        "stan": "Runs phpstan to check standards",
+        "runall": "Runs all tests (fixer, phpunit, phpstan)"
+    }
+}

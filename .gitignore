@@ -1,0 +1,8 @@
+/vendor/
+/build/
+/resources/
+/.build/
+.php-cs-fixer.cache
+composer.lock
+.env
+test.php
