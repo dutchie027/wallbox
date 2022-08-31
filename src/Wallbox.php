@@ -288,6 +288,25 @@ class Wallbox
         return $this->p_log;
     }
 
+    public function getStats($id, $start, $end)
+    {
+        $payload = [
+            'charger' => $id,
+            'start_date' => $start,
+            'end_date' => $end
+        ];
+        $httpPayload = http_build_query($payload);
+
+        $URL = self::API_URL . self::SESSION_LIST_URI . "?" . $httpPayload;
+        return $this->makeAPICall('GET', $URL);
+    }
+
+    public function getChargerStatus($id)
+    {
+        $URL = self::API_URL . self::CHARGER_STATUS_URI . $id;
+        return $this->makeAPICall('GET', $URL);
+    }
+
     /**
      * pGetLogPath
      * Returns full path and name of the log file
@@ -382,7 +401,7 @@ class Wallbox
         try {
             $request = $this->guzzle->request($type, $url, $data);
 
-            return $request->getBody();
+            return $request->getBody()->getContents();
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $response = $e->getResponse();
@@ -393,5 +412,13 @@ class Wallbox
 
             throw new WallboxAPIRequestException('An unknown error ocurred while performing the request to ' . $url);
         }
+    }
+
+    public function convertSeconds($seconds)
+    {
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds / 60) % 60);
+        $seconds = $seconds % 60;
+        return $hours > 0 ? "{$hours}h {$minutes}m" : ($minutes > 0 ? "{$minutes}m {$seconds}s" : "{$seconds}s");
     }
 }
