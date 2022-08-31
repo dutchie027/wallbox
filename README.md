@@ -32,17 +32,23 @@ $data = json_decode($wallbox->getFullPayload(), true);
 
 #### checkLock
 
+Returns true/false if the charger is locked. `true` if the charger is locked, `false` if the charger is unlocked.
+
 ```php
 print $wallbox->checkLock($id);
 ```
 
 #### getStats
 
+Returns a JSON payload of stats for the charger between start and int (epoch times).
+
 ```php
-print $wallbox->getStats($id);
+print $wallbox->getStats($id, $start, $end);
 ```
 
 #### getChargerStatus
+
+Returns a JSON payload of status of the specific charger. [Sample payload](snippets/getChargerStatus.txt)
 
 ```php
 print $wallbox->getChargerStatus($id);
@@ -50,17 +56,23 @@ print $wallbox->getChargerStatus($id);
 
 #### getFullPayload
 
+Returns a JSON payload of status of the all chargers. [Sample payload](snippets/getFullPayload.txt)
+
 ```php
-print $wallbox->getFullPayload($id);
+print $wallbox->getFullPayload();
 ```
 
 #### getLastChargeDuration
 
+Returns time in _x_h _x_m if hours and minutes. If only minutes it returns _x_m _x_s.
+
 ```php
-print $wallbox->getLastChargeDuration($id);
+print $wallbox->getLastChargeDuration();
 ```
 
 #### checkFirmwareStatus
+
+Checks if the firmware is up-to-date. Returns a human string about the status
 
 ```php
 print $wallbox->checkFirmwareStatus($id);
@@ -68,11 +80,15 @@ print $wallbox->checkFirmwareStatus($id);
 
 #### unlockCharger
 
+Unlocks the charger.
+
 ```php
 print $wallbox->unlockCharger($id);
 ```
 
 #### lockCharger
+
+Locks the charger.
 
 ```php
 print $wallbox->lockCharger($id);
@@ -80,17 +96,23 @@ print $wallbox->lockCharger($id);
 
 #### getChargerData
 
+Returns JSON payload of the specific charger data [sample](snippets/getChargerData.txt)
+
 ```php
 print $wallbox->getChargerData($id);
 ```
 
 #### getTotalChargeTime
 
+Returns time in _x_h _x_m if hours and minutes. If only minutes it returns _x_m _x_s.
+
 ```php
 print $wallbox->getTotalChargeTime($id);
 ```
 
 #### getTotalSessions
+
+Returns an integer denoting total charge sessions
 
 ```php
 print $wallbox->getTotalSessions($id);
