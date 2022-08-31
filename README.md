@@ -1,5 +1,8 @@
 # wallbox
-Wallbox API
+
+[![Packagist Downloads](https://img.shields.io/packagist/dm/dutchie027/wallbox)](https://packagist.org/packages/dutchie027/wallbox)
+[![CodeFactor](https://www.codefactor.io/repository/github/dutchie027/wallbox/badge)](https://www.codefactor.io/repository/github/dutchie027/wallbox)
+
 
 ## Overview
 This API wrapper was written to allow me to get better metrics and usage out of my wallbox EVSE.
