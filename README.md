@@ -28,6 +28,73 @@ $wallbox = new dutchie027\Wallbox\Wallbox($_ENV['API_USERNAME'], $_ENV['API_PASS
 $data = json_decode($wallbox->getFullPayload(), true);
 ...
 ```
+### Functions
+
+#### checkLock
+
+```php
+print $wallbox->checkLock($id);
+```
+
+#### getStats
+
+```php
+print $wallbox->getStats($id);
+```
+
+#### getChargerStatus
+
+```php
+print $wallbox->getChargerStatus($id);
+```
+
+#### getFullPayload
+
+```php
+print $wallbox->getFullPayload($id);
+```
+
+#### getLastChargeDuration
+
+```php
+print $wallbox->getLastChargeDuration($id);
+```
+
+#### checkFirmwareStatus
+
+```php
+print $wallbox->checkFirmwareStatus($id);
+```
+
+#### unlockCharger
+
+```php
+print $wallbox->unlockCharger($id);
+```
+
+#### lockCharger
+
+```php
+print $wallbox->lockCharger($id);
+```
+
+#### getChargerData
+
+```php
+print $wallbox->getChargerData($id);
+```
+
+#### getTotalChargeTime
+
+```php
+print $wallbox->getTotalChargeTime($id);
+```
+
+#### getTotalSessions
+
+```php
+print $wallbox->getTotalSessions($id);
+```
 
 ## Dependencies
 The code uses a few external libraries, but they're all bundled in the composer.json file.
