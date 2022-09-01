@@ -27,7 +27,7 @@ include_once 'vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
 
-$wallbox = new dutchie027\Wallbox\Wallbox($_ENV['API_USERNAME'], $_ENV['API_PASSWORD']);
+$wallbox = new dutchie027\Wallbox\Wallbox();
 ...
 ```
 ### Functions
