@@ -16,9 +16,6 @@ namespace dutchie027\Wallbox;
 use dutchie027\Wallbox\Exceptions\WallboxAPIRequestException;
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 
 class Wallbox
 {
@@ -129,60 +126,11 @@ class Wallbox
     protected const SESSION_LIST_URI = '/v4/sessions/stats';
 
     /**
-     * Log Directory
-     *
-     * @var string
-     */
-    protected $p_log_location;
-
-    /**
      * JWT Token
      *
      * @var string
      */
     protected $p_jwt;
-
-    /**
-     * Base 64 Token
-     *
-     * @var string
-     */
-    protected $p_token;
-
-    /**
-     * Log Reference
-     *
-     * @var string
-     */
-    protected $p_log;
-
-    /**
-     * Log Name
-     *
-     * @var string
-     */
-    protected $p_log_name;
-
-    /**
-     * Log File Tag
-     *
-     * @var string
-     */
-    protected $p_log_tag = 'wallbox';
-
-    /**
-     * Log Types
-     *
-     * @var array
-     */
-    protected $log_literals = [
-        'debug',
-        'info',
-        'notice',
-        'warning',
-        'critical',
-        'error',
-    ];
 
     /**
      * The Guzzle HTTP client instance.
@@ -192,66 +140,20 @@ class Wallbox
     public $guzzle;
 
     /**
-     * Default constructor
+     * The Config class
+     *
+     * @var Config
      */
-    public function __construct($user, $password, array $attributes = [], Guzzle $guzzle = null)
-    {
-        $tokenString = $user . ':' . $password;
-        $base64 = base64_encode($tokenString);
-        $this->p_token = $base64;
-
-        if (isset($attributes['log_dir']) && is_dir($attributes['log_dir'])) {
-            $this->p_log_location = $attributes['log_dir'];
-        } else {
-            $this->p_log_location = sys_get_temp_dir();
-        }
-
-        if (isset($attributes['log_name'])) {
-            $this->p_log_name = $attributes['log_name'];
-
-            if (!preg_match("/\.log$/", $this->p_log_name)) {
-                $this->p_log_name .= '.log';
-            }
-        } else {
-            $this->p_log_name = $this->pGenRandomString() . '.' . time() . '.log';
-        }
-
-        if (isset($attributes['log_tag'])) {
-            $this->p_log = new Logger($attributes['log_tag']);
-        } else {
-            $this->p_log = new Logger($this->p_log_tag);
-        }
-
-        if (isset($attributes['log_level']) && in_array($attributes['log_level'], $this->log_literals, true)) {
-            if ($attributes['log_level'] == 'debug') {
-                $this->p_log->pushHandler(new StreamHandler($this->pGetLogPath(), \Monolog\Level::Debug));
-            } elseif ($attributes['log_level'] == 'info') {
-                $this->p_log->pushHandler(new StreamHandler($this->pGetLogPath(), \Monolog\Level::Info));
-            } elseif ($attributes['log_level'] == 'notice') {
-                $this->p_log->pushHandler(new StreamHandler($this->pGetLogPath(), \Monolog\Level::Notice));
-            } elseif ($attributes['log_level'] == 'warning') {
-                $this->p_log->pushHandler(new StreamHandler($this->pGetLogPath(), \Monolog\Level::Warning));
-            } elseif ($attributes['log_level'] == 'error') {
-                $this->p_log->pushHandler(new StreamHandler($this->pGetLogPath(), \Monolog\Level::Error));
-            } elseif ($attributes['log_level'] == 'critical') {
-                $this->p_log->pushHandler(new StreamHandler($this->pGetLogPath(), \Monolog\Level::Critical));
-            } else {
-                $this->p_log->pushHandler(new StreamHandler($this->pGetLogPath(), \Monolog\Level::Warning));
-            }
-        } else {
-            $this->p_log->pushHandler(new StreamHandler($this->pGetLogPath(), \Monolog\Level::Info));
-        }
-        $this->guzzle = $guzzle ?: new Guzzle();
-        $this->usernamePasswordAuth();
-    }
+    public $config;
 
     /**
-     * getLogLocation
-     * Alias to Get Log Path
+     * Default constructor
      */
-    public function getLogLocation(): string
+    public function __construct()
     {
-        return $this->pGetLogPath();
+        $this->config = $this->config ?: new Config();
+        $this->guzzle = $this->guzzle ?: new Guzzle();
+        $this->usernamePasswordAuth();
     }
 
     /**
@@ -307,15 +209,6 @@ class Wallbox
     }
 
     /**
-     * getLogPointer
-     * Returns a referencd to the logger
-     */
-    public function getLogPointer(): string
-    {
-        return $this->p_log;
-    }
-
-    /**
      * getStats
      * Calls Stats URI and gets data between start and end
      *
@@ -351,15 +244,6 @@ class Wallbox
     }
 
     /**
-     * pGetLogPath
-     * Returns full path and name of the log file
-     */
-    protected function pGetLogPath(): string
-    {
-        return $this->p_log_location . '/' . $this->p_log_name;
-    }
-
-    /**
      * getFullPayload
      */
     public function getFullPayload(): string
@@ -387,7 +271,7 @@ class Wallbox
             $array['Authorization'] = 'Bearer ' . $this->getJWTToken();
         } else {
             $array['Partner'] = 'wallbox';
-            $array['Authorization'] = 'Basic ' . $this->p_token;
+            $array['Authorization'] = 'Basic ' . $this->config->getToken();
         }
 
         return $array;
@@ -494,12 +378,12 @@ class Wallbox
      * makeAPICall
      * Makes the API Call
      *
-     * @param $type string GET|POST|DELETE|PATCH
-     * @param $url string endpoint
-     * @param $body string - usually passed as JSON
+     * @param string $type  string GET|POST|DELETE|PATCH
+     * @param string $url   string endpoint
+     * @param string $body  string - usually passed as JSON
+     * @param bool   $token
      *
      * @throws WallboxAPIRequestException Exception with details regarding the failed request
-     *
      */
     public function makeAPICall($type, $url, $token = true, $body = null): string
     {
@@ -526,7 +410,7 @@ class Wallbox
      * convertSeconds
      * Returns a referencd to the logger
      */
-    public function convertSeconds($seconds): string
+    public function convertSeconds(int $seconds): string
     {
         $hours = floor($seconds / 3600);
         $minutes = floor(($seconds / 60) % 60);
