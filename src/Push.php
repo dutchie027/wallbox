@@ -6,9 +6,9 @@ namespace dutchie027\Wallbox;
 
 class Push
 {
-
     private $poApp;
     private $poUser;
+
     /**
      * Default Constructor - Initialize Values
      */

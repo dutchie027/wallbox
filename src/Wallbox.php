@@ -433,14 +433,15 @@ class Wallbox
      */
     public function monitor(int $id, int $seconds = 30): void
     {
-        if (php_sapi_name() !== "cli") {
+        if (php_sapi_name() !== 'cli') {
             throw new WallboxAPIException('This call is only allwed to be made from the CLI');
         }
 
         $fp = fopen(__FILE__, 'r');
 
         if (!flock($fp, LOCK_EX | LOCK_NB)) {
-            print "Tried to start up but already running. Exiting" . PHP_EOL;
+            print 'Tried to start up but already running. Exiting' . PHP_EOL;
+
             exit;
         }
 
@@ -453,11 +454,9 @@ class Wallbox
     /**
      * pushover
      * Pointer to the \Push class
-     *
      */
     public function pushover(): Push
     {
-        $po = new Push($this);
-        return $po;
+        return new Push($this);
     }
 }
