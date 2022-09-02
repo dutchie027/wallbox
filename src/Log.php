@@ -41,6 +41,7 @@ final class Log
         }
 
         $logger = new Logger(Config::getLogPrefix());
+        /** @phpstan-ignore-next-line */
         $logger->pushHandler(new StreamHandler(Config::getLogDir() . DIRECTORY_SEPARATOR . Config::getLogPrefix() . date('-Y-m-d') . '.log', Config::getLogLevel()));
         self::$instance = $logger;
         self::$is_set = true;

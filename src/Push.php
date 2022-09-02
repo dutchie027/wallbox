@@ -6,7 +6,18 @@ namespace dutchie027\Wallbox;
 
 class Push
 {
+    /**
+     * Pushover Application Class
+     *
+     * @var \Serhiy\Pushover\Application
+     */
     private $poApp;
+
+    /**
+     * Pushover Recipient Class
+     *
+     * @var \Serhiy\Pushover\Recipient
+     */
     private $poUser;
 
     /**
@@ -18,7 +29,7 @@ class Push
         $this->poUser = new \Serhiy\Pushover\Recipient($_ENV['PUSHOVER_USER']);
     }
 
-    public function sendPush($title, $body)
+    public function sendPush(string $title, string $body): void
     {
         $message = new \Serhiy\Pushover\Api\Message\Message($body, $title);
         $notification = new \Serhiy\Pushover\Api\Message\Notification($this->poApp, $this->poUser, $message);

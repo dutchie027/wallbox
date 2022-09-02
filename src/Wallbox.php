@@ -155,12 +155,19 @@ class Wallbox
     public $push;
 
     /**
+     * ID Of the current status
+     *
+     * @var int
+     */
+    private $currentStatus = 0;
+
+    /**
      * Default constructor
      */
     public function __construct()
     {
-        $this->config = $this->config ?: new Config();
-        $this->guzzle = $this->guzzle ?: new Guzzle();
+        $this->config = ($this->config instanceof Config && is_object($this->config)) ? $this->config : new Config();
+        $this->guzzle = ($this->guzzle instanceof Guzzle && is_object($this->guzzle)) ? $this->guzzle : new Guzzle();
         $this->usernamePasswordAuth();
     }
 
@@ -168,7 +175,7 @@ class Wallbox
      * getStatusName
      * Returns the name of the status associated with the ID
      */
-    public function getStatusName($id): string
+    public function getStatusName(int $id): string
     {
         return self::STATUS_LOOKUP[$id];
     }
@@ -176,12 +183,10 @@ class Wallbox
     /**
      * getStatusName
      * Returns the name of the status associated with the ID
-     *
-     * @param int $id
      */
-    public function checkFirmwareStatus($id): string
+    public function checkFirmwareStatus(int $id): string
     {
-        $chargerConfig = json_decode($this->getChargerStatus($id));
+        $chargerConfig = json_decode($this->getFullChargerStatus($id));
         $cv = $chargerConfig->config_data->software->currentVersion;
         $lv = $chargerConfig->config_data->software->latestVersion;
         $ua = $chargerConfig->config_data->software->updateAvailable;
@@ -196,15 +201,10 @@ class Wallbox
     /**
      * getStatusName
      * Returns the name of the status associated with the ID
-     *
-     * @param int $id
      */
-    public function checkLock($id): bool
+    public function checkLock(int $id): bool
     {
-        $chargerConfig = json_decode($this->getChargerStatus($id));
-        $locked = $chargerConfig->config_data->locked;
-
-        return $locked == 1 ? true : false;
+        return json_decode($this->getFullChargerStatus($id))->config_data->locked === 1 ? true : false;
     }
 
     /**
@@ -219,17 +219,14 @@ class Wallbox
     /**
      * getStats
      * Calls Stats URI and gets data between start and end
-     *
-     * @param int $id
-     * @param int $start
-     * @param int $end
      */
-    public function getStats($id, $start, $end): string
+    public function getStats(int $id, int $start, int $end, int $limit = 1000): string
     {
         $payload = [
             'charger' => $id,
             'start_date' => $start,
             'end_date' => $end,
+            'limit' => $limit,
         ];
         $httpPayload = http_build_query($payload);
 
@@ -241,14 +238,19 @@ class Wallbox
     /**
      * getChargerStatus
      * Returns full data about charger
-     *
-     * @param int $id
      */
-    public function getChargerStatus($id): string
+    public function getFullChargerStatus(int $id): string
     {
-        $URL = self::API_URL . self::CHARGER_STATUS_URI . $id;
+        return $this->makeAPICall('GET', self::API_URL . self::CHARGER_STATUS_URI . $id);
+    }
 
-        return $this->makeAPICall('GET', $URL);
+    /**
+     * getChargerStatus
+     * Returns full data about charger
+     */
+    public function getChargerStatusID(int $id): int
+    {
+        return json_decode($this->getChargerData($id))->data->chargerData->status;
     }
 
     /**
@@ -256,18 +258,16 @@ class Wallbox
      */
     public function getFullPayload(): string
     {
-        $URL = self::API_URL . self::LIST_URI;
-
-        return $this->makeAPICall('GET', $URL);
+        return $this->makeAPICall('GET', self::API_URL . self::LIST_URI);
     }
 
     /**
      * setHeaders
      * Sets the headers using the API Token
      *
-     * @param bool $bearer
+     * @return array<mixed>
      */
-    public function setHeaders($bearer = true): array
+    public function setHeaders(bool $bearer = true): array
     {
         $array = [
             'User-Agent' => 'php-api-dutchie027/' . self::LIBRARY_VERSION,
@@ -290,86 +290,62 @@ class Wallbox
      */
     private function usernamePasswordAuth(): void
     {
-        $authURL = self::API_LOGIN . self::AUTH_URI;
-        $this->p_jwt = json_decode($this->makeAPICall('GET', $authURL, false))->data->attributes->token;
+        $this->p_jwt = json_decode($this->makeAPICall('GET', self::API_LOGIN . self::AUTH_URI, false))->data->attributes->token;
     }
 
     /**
      * getLastChargeDuration
      */
-    public function getLastChargeDuration()
+    public function getLastChargeDuration(): string
     {
-        $data = json_decode($this->getFullPayload(), true);
-
-        return $this->convertSeconds($data['result']['groups'][0]['chargers'][0]['chargingTime']);
+        return $this->convertSeconds(json_decode($this->getFullPayload(), true)['result']['groups'][0]['chargers'][0]['chargingTime']);
     }
 
     /**
      * unlockCharger
-     *
-     * @param int $id
      */
-    public function unlockCharger($id): void
+    public function unlockCharger(int $id): void
     {
-        $URL = self::API_URL . self::CHARGER_ACTION_URI . $id;
-        $body = '{"locked":0}';
-        $this->makeAPICall('PUT', $URL, true, $body);
+        $this->makeAPICall('PUT', self::API_URL . self::CHARGER_ACTION_URI . $id, true, '{"locked":0}');
     }
 
     /**
      * lockCharger
-     *
-     * @param int $id
      */
-    public function lockCharger($id): void
+    public function lockCharger(int $id): void
     {
-        $URL = self::API_URL . self::CHARGER_ACTION_URI . $id;
-        $body = '{"locked":1}';
-        $this->makeAPICall('PUT', $URL, true, $body);
+        $this->makeAPICall('PUT', self::API_URL . self::CHARGER_ACTION_URI . $id, true, '{"locked":1}');
     }
 
     /**
      * getChargerData
-
-     *
-     * @param int $id
      */
-    public function getChargerData($id): string
+    public function getChargerData(int $id): string
     {
-        $URL = self::API_URL . self::CHARGER_ACTION_URI . $id;
-
-        return $this->makeAPICall('GET', $URL);
+        return $this->makeAPICall('GET', self::API_URL . self::CHARGER_ACTION_URI . $id);
     }
 
     /**
      * getTotalChargeTime
-     *
-     * @param int $id
      */
-    public function getTotalChargeTime($id): string
+    public function getTotalChargeTime(int $id): string
     {
-        $data = json_decode($this->getChargerData($id));
-
-        return $this->convertSeconds($data->data->chargerData->resume->chargingTime);
+        return $this->convertSeconds(json_decode($this->getChargerData($id))->data->chargerData->resume->chargingTime);
     }
 
     /**
      * getTotalSessions
      */
-    public function getTotalSessions($id): string
+    public function getTotalSessions(int $id): string
     {
-        $data = json_decode($this->getChargerData($id));
-
-        return $data->data->chargerData->resume->totalSessions;
+        return json_decode($this->getChargerData($id))->data->chargerData->resume->totalSessions;
     }
 
     /**
      * pGenRandomString
      * Generates a random string of $length
-     *
-     * @param int $length
      */
-    public function pGenRandomString($length = 6): string
+    public function pGenRandomString(int $length = 6): string
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
@@ -385,15 +361,8 @@ class Wallbox
     /**
      * makeAPICall
      * Makes the API Call
-     *
-     * @param string $type  string GET|POST|DELETE|PATCH
-     * @param string $url   string endpoint
-     * @param string $body  string - usually passed as JSON
-     * @param bool   $token
-     *
-     * @throws WallboxAPIRequestException Exception with details regarding the failed request
      */
-    public function makeAPICall($type, $url, $token = true, $body = null): string
+    public function makeAPICall(string $type, string $url, bool $token = true, string|null $body = null): string
     {
         $data['headers'] = $this->setHeaders($token);
         $data['body'] = $body;
@@ -403,14 +372,7 @@ class Wallbox
 
             return $request->getBody()->getContents();
         } catch (RequestException $e) {
-            if ($e->hasResponse()) {
-                $response = $e->getResponse();
-                $ja = $response->getBody()->getContents();
-
-                throw new WallboxAPIRequestException('An error occurred while performing the request to ' . $url . ' -> ' . ($ja['error'] ?? json_encode($ja)));
-            }
-
-            throw new WallboxAPIRequestException('An unknown error ocurred while performing the request to ' . $url);
+            throw new WallboxAPIRequestException('An error occurred while performing the request to ' . $url);
         }
     }
 
@@ -439,14 +401,43 @@ class Wallbox
 
         $fp = fopen(__FILE__, 'r');
 
-        if (!flock($fp, LOCK_EX | LOCK_NB)) {
-            print 'Tried to start up but already running. Exiting' . PHP_EOL;
-
-            exit;
+        if (is_resource($fp) && !flock($fp, LOCK_EX | LOCK_NB)) {
+            throw new WallboxAPIException('Tried to start up but already running. Exiting.');
         }
 
+        /** @phpstan-ignore-next-line */
         while (true) {
-            Log::info("We're in monitor mode. Gonna start logging what I'm doing");
+            Log::info('Running in monitor mode...Polling');
+
+            $statusID = (int) $this->getChargerStatusID($id);
+            $sendPush = false;
+            $title = $body = '';
+
+            if ($this->currentStatus == 0) {
+                $sendPush = true;
+                $title = 'Wallbox monitoring started';
+                $body = 'The wallbox monitor has just started. The current status is ' . $this->getStatusName($statusID);
+                $this->currentStatus = $statusID;
+            } elseif ($this->currentStatus != $statusID) {
+                $sendPush = true;
+                $title = 'Wallbox Status Change: ' . $this->getStatusName($this->currentStatus) . ' to ' . $this->getStatusName($statusID);
+
+                if ($this->currentStatus == 193 || $this->currentStatus == 194) {
+                    Log::info('Went from charging to not charging anymore...');
+                    $duration = $this->getLastChargeDuration();
+
+                    $body = 'Total charge time ' . $duration;
+                } elseif ($statusID == 193 || $statusID == 194) {
+                    Log::info('Went from not charging to charging...');
+                    $body = 'Wallbox now charging...';
+                }
+                $this->currentStatus = $statusID;
+            }
+
+            if ($sendPush) {
+                $this->pushover()->sendPush($title, $body);
+            }
+
             sleep($seconds);
         }
     }
@@ -457,6 +448,6 @@ class Wallbox
      */
     public function pushover(): Push
     {
-        return new Push($this);
+        return new Push();
     }
 }

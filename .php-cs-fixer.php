@@ -5,6 +5,7 @@ declare(strict_types=1);
 $finder = PhpCsFixer\Finder::create()
     ->exclude([
         '.build/',
+        'build/',
         '.github/',
         'vendor-bin/',
     ])

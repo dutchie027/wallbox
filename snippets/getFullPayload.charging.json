@@ -1,0 +1,78 @@
+{
+    "result": {
+        "groups": [
+            {
+                "id": 123456,
+                "uid": "123e4567-e89b-12d3-a456-426614174000",
+                "parent": null,
+                "name": "Family",
+                "profile": {
+                    "id": 4,
+                    "name": "super-admin"
+                },
+                "currency": 1,
+                "energyPrice": 0.2,
+                "chargers": [
+                    {
+                        "id": 123456,
+                        "uid": "1234567890ABCDEF9876543210",
+                        "access": true,
+                        "name": "My Charger",
+                        "status": 194,
+                        "chargerType": "Pulsar Plus US",
+                        "ocppReady": "ocpp_1.6j",
+                        "ocppConnectionStatus": 1,
+                        "connectionType": "wifi",
+                        "locked": 0,
+                        "maxChargingCurrent": 32,
+                        "addedEnergy": 0.987,
+                        "chargingPower": 0,
+                        "chargingTime": 483,
+                        "energyUnit": "kWh",
+                        "powerUnit": "kW",
+                        "image": "https:\/\/api.wall-box.com\/uploads\/PUP1-U-1-5-N-002-A.png",
+                        "lastConnection": 1662137955,
+                        "lastSync": 1662127235,
+                        "wifiSignal": 75,
+                        "chargerLoadType": "Private",
+                        "currency": 1,
+                        "energyPrice": 0.077,
+                        "energyCost": {
+                            "value": 0.077,
+                            "inheritedGroupId": null
+                        },
+                        "remoteAction": 0,
+                        "software": {
+                            "updateAvailable": false,
+                            "currentVersion": "5.11.14",
+                            "latestVersion": "5.11.14",
+                            "fileName": "pup1.tar"
+                        },
+                        "midStatus": 0,
+                        "midEnabled": false,
+                        "country": "US",
+                        "state": "GA",
+                        "operationMode": "wallbox"
+                    }
+                ],
+                "payments_account": false,
+                "plan": {
+                    "id": 1,
+                    "product_id": 1,
+                    "name": "Basic",
+                    "description": null,
+                    "features": [
+                        "DEFAULT_FEATURE",
+                        "POWER_BOOST",
+                        "MOBILE_CONNECTIVITY",
+                        "AUTOMATIC_REPORTING",
+                        "STATISTICS"
+                    ]
+                },
+                "billingInformation": null,
+                "customer": null,
+                "subscription": null
+            }
+        ]
+    }
+}

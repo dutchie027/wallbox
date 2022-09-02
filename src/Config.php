@@ -6,12 +6,6 @@ namespace dutchie027\Wallbox;
 
 class Config
 {
-    /**
-     *  @const array<int>
-     * 'DEBUG'|'INFO'|'NOTICE'|'WARNING'|'ERROR'|'CRITICAL'|'ALERT'|'EMERGENCY'
-     */
-    private const ALLOWED_LEVELS = [100, 200, 250, 300, 400, 500, 550, 600];
-
     private static string $s_log_dir;
 
     private static int $s_log_level;
