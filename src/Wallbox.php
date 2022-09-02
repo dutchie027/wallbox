@@ -407,8 +407,6 @@ class Wallbox
 
         /** @phpstan-ignore-next-line */
         while (true) {
-
-
             $statusID = (int) $this->getChargerStatusID($id);
             $sendPush = false;
             $title = $body = '';
@@ -425,13 +423,16 @@ class Wallbox
                 $title = 'Wallbox Status Change: ' . $this->getStatusName($this->currentStatus) . ' to ' . $this->getStatusName($statusID);
 
                 if ($this->currentStatus == 193 || $this->currentStatus == 194) {
-                    Log::info('Went from charging to not charging anymore...');
+                    // Log::info('Went from charging to not charging anymore...');
                     $duration = $this->getLastChargeDuration();
 
                     $body = 'Total charge time ' . $duration;
                 } elseif ($statusID == 193 || $statusID == 194) {
-                    Log::info('Went from not charging to charging...');
+                    // Log::info('Went from not charging to charging...');
                     $body = 'Wallbox now charging...';
+                } else {
+                    // Log::info('Went from not charging to charging...');
+                    $body = 'Status update only...';
                 }
                 $this->currentStatus = $statusID;
             }
