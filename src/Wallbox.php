@@ -413,7 +413,7 @@ class Wallbox
             $sendPush = false;
             $title = $body = '';
 
-            Log::info('Running in monitor mode...Polling. Current Status: ' . $this->currentStatus . ' Previous Status: $statusID');
+            Log::info('Running in monitor mode...Polling. Current Status: ' . $this->currentStatus . ' Previous Status: ' . $statusID);
 
             if ($this->currentStatus == 0) {
                 $sendPush = true;
