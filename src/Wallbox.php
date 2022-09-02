@@ -13,6 +13,7 @@
 
 namespace dutchie027\Wallbox;
 
+use dutchie027\Wallbox\Exceptions\WallboxAPIException;
 use dutchie027\Wallbox\Exceptions\WallboxAPIRequestException;
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Exception\RequestException;
@@ -29,7 +30,7 @@ class Wallbox
     /**
      * Status IDs
      *
-     * @const array
+     * @const array<mixed>
      */
     protected const STATUS_LOOKUP = [
         164 => 'WAITING',
@@ -145,6 +146,13 @@ class Wallbox
      * @var Config
      */
     public $config;
+
+    /**
+     * The Push class
+     *
+     * @var Push
+     */
+    public $push;
 
     /**
      * Default constructor
@@ -417,5 +425,39 @@ class Wallbox
         $seconds = $seconds % 60;
 
         return $hours > 0 ? "{$hours}h {$minutes}m" : ($minutes > 0 ? "{$minutes}m {$seconds}s" : "{$seconds}s");
+    }
+
+    /**
+     * convertSeconds
+     * Returns a referencd to the logger
+     */
+    public function monitor(int $id, int $seconds = 30): void
+    {
+        if (php_sapi_name() !== "cli") {
+            throw new WallboxAPIException('This call is only allwed to be made from the CLI');
+        }
+
+        $fp = fopen(__FILE__, 'r');
+
+        if (!flock($fp, LOCK_EX | LOCK_NB)) {
+            print "Tried to start up but already running. Exiting" . PHP_EOL;
+            exit;
+        }
+
+        while (true) {
+            Log::info("We're in monitor mode. Gonna start logging what I'm doing");
+            sleep($seconds);
+        }
+    }
+
+    /**
+     * pushover
+     * Pointer to the \Push class
+     *
+     */
+    public function pushover(): Push
+    {
+        $po = new Push($this);
+        return $po;
     }
 }

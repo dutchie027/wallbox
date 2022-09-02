@@ -3,11 +3,12 @@
 [![Packagist Downloads](https://img.shields.io/packagist/dm/dutchie027/wallbox)](https://packagist.org/packages/dutchie027/wallbox)
 [![CodeFactor](https://www.codefactor.io/repository/github/dutchie027/wallbox/badge)](https://www.codefactor.io/repository/github/dutchie027/wallbox)
 
-
 ## Overview
+
 This API wrapper was written to allow me to get better metrics and usage out of my wallbox EVSE.
 
 ## Usage
+
 To start, simply download the package using composer:
 
 ```php
@@ -30,6 +31,30 @@ $dotenv->safeLoad();
 $wallbox = new dutchie027\Wallbox\Wallbox();
 ...
 ```
+
+### Running as a monitor
+
+The most common use case for the script(s) are a monitoring system. To accomplish this, there is a function called `monitor` that uses a lot of defaults and will notify you of changes to the system. It will check the EVSE every 30 seconds by default and notify you of any changes using pushover with the configuration settings in `.env`. To monitor the system, first create a file called `monitor.php` using the below:
+
+```php
+#!/usr/bin/php
+<?php
+
+include_once 'vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->safeLoad();
+
+$wallbox = new dutchie027\Wallbox\Wallbox();
+$wallbox->monitor();
+```
+
+After you've created the monitoring file, ensure it's executable by running `chmod +x monitor.php`. Once you've done that, simply trigger it with a `nohup` so it runs in the background:
+
+```bash
+nohup ./monitor.php >/dev/null 2>&1 &
+```
+
 ### Functions
 
 #### checkLock
@@ -66,7 +91,7 @@ print $wallbox->getFullPayload();
 
 #### getLastChargeDuration
 
-Returns time in _x_h _x_m if hours and minutes. If only minutes it returns _x_m _x_s.
+Returns time in *x*h *x*m if hours and minutes. If only minutes it returns *x*m *x*s.
 
 ```php
 print $wallbox->getLastChargeDuration();
@@ -106,7 +131,7 @@ print $wallbox->getChargerData($id);
 
 #### getTotalChargeTime
 
-Returns time in _x_h _x_m if hours and minutes. If only minutes it returns _x_m _x_s.
+Returns time in *x*h *x*m if hours and minutes. If only minutes it returns *x*m *x*s.
 
 ```php
 print $wallbox->getTotalChargeTime($id);
@@ -121,6 +146,7 @@ print $wallbox->getTotalSessions($id);
 ```
 
 ## Dependencies
+
 The code uses a few external libraries, but they're all bundled in the composer.json file.
 
 * monolog/monolog
@@ -129,4 +155,5 @@ The code uses a few external libraries, but they're all bundled in the composer.
 * serhiy/pushover
 
 ## Acknowledgements
+
 Shout out to the [Python work](https://github.com/cliviu74/wallbox) that [cliviu74](https://github.com/cliviu74) did. This was the foundation that gave me a lot of the URLs.
