@@ -153,6 +153,8 @@ class Wallbox
      */
     public $push;
 
+    public $logHandler;
+
     /**
      * ID Of the current status
      *
@@ -167,6 +169,7 @@ class Wallbox
     {
         $this->config = ($this->config instanceof Config && is_object($this->config)) ? $this->config : new Config();
         $this->guzzle = ($this->guzzle instanceof Guzzle && is_object($this->guzzle)) ? $this->guzzle : new Guzzle();
+        $this->logHandler = ($this->logHandler instanceof Logger && is_object($this->logHandler)) ? $this->logHandler : new Log();
         $this->usernamePasswordAuth();
     }
 
@@ -403,5 +406,10 @@ class Wallbox
     public function pushover(): Push
     {
         return new Push();
+    }
+
+    public function log(): \Monolog\Logger
+    {
+        return $this->logHandler->returnLogger();
     }
 }
