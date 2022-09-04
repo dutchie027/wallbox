@@ -169,7 +169,6 @@ class Wallbox
     {
         $this->config = ($this->config instanceof Config && is_object($this->config)) ? $this->config : new Config();
         $this->guzzle = ($this->guzzle instanceof Guzzle && is_object($this->guzzle)) ? $this->guzzle : new Guzzle();
-        $this->logHandler = ($this->logHandler instanceof Logger && is_object($this->logHandler)) ? $this->logHandler : new Log();
         $this->usernamePasswordAuth();
     }
 
@@ -399,6 +398,53 @@ class Wallbox
         return $hours > 0 ? "{$hours}h {$minutes}m" : ($minutes > 0 ? "{$minutes}m {$seconds}s" : "{$seconds}s");
     }
 
+
+    /**
+     * convertSeconds
+     * Returns a referencd to the logger
+     */
+    public function monitor(int $id, int $seconds = 30): void
+    {
+
+        while (true) {
+            $statusID = (int) $this->getChargerStatusID($id);
+            $sendPush = false;
+            $title = $body = '';
+
+            Log::info('Running in monitor mode...Polling. Current Status: ' . $this->currentStatus . ' Previous Status: ' . $statusID);
+
+            if ($this->currentStatus == 0) {
+                $sendPush = true;
+                $title = 'Wallbox monitoring started';
+                $body = 'The wallbox monitor has just started. The current status is ' . $this->getStatusName($statusID);
+                $this->currentStatus = $statusID;
+            } elseif ($this->currentStatus != $statusID) {
+                $sendPush = true;
+                $title = 'Wallbox Status Change: ' . $this->getStatusName($this->currentStatus) . ' to ' . $this->getStatusName($statusID);
+
+                if ($this->currentStatus == 193 || $this->currentStatus == 194) {
+                    // Log::info('Went from charging to not charging anymore...');
+                    $duration = $this->getLastChargeDuration();
+
+                    $body = 'Total charge time ' . $duration;
+                } elseif ($statusID == 193 || $statusID == 194) {
+                    // Log::info('Went from not charging to charging...');
+                    $body = 'Wallbox now charging...';
+                } else {
+                    // Log::info('Went from not charging to charging...');
+                    $body = 'Status update only...';
+                }
+                $this->currentStatus = $statusID;
+            }
+
+            if ($sendPush) {
+                $this->pushover()->sendPush($title, $body);
+            }
+
+            sleep($seconds);
+        }
+    }
+
     /**
      * pushover
      * Pointer to the \Push class
@@ -406,10 +452,5 @@ class Wallbox
     public function pushover(): Push
     {
         return new Push();
-    }
-
-    public function log(): \Monolog\Logger
-    {
-        return $this->logHandler->returnLogger();
     }
 }
