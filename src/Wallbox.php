@@ -13,7 +13,6 @@
 
 namespace dutchie027\Wallbox;
 
-use dutchie027\Wallbox\Exceptions\WallboxAPIException;
 use dutchie027\Wallbox\Exceptions\WallboxAPIRequestException;
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Exception\RequestException;
@@ -294,6 +293,14 @@ class Wallbox
     }
 
     /**
+     * reAuth
+     */
+    public function reAuth(): void
+    {
+        $this->usernamePasswordAuth;
+    }
+
+    /**
      * getLastChargeDuration
      */
     public function getLastChargeDuration(): string
@@ -387,62 +394,6 @@ class Wallbox
         $seconds = $seconds % 60;
 
         return $hours > 0 ? "{$hours}h {$minutes}m" : ($minutes > 0 ? "{$minutes}m {$seconds}s" : "{$seconds}s");
-    }
-
-    /**
-     * convertSeconds
-     * Returns a referencd to the logger
-     */
-    public function monitor(int $id, int $seconds = 30): void
-    {
-        if (php_sapi_name() !== 'cli') {
-            throw new WallboxAPIException('This call is only allwed to be made from the CLI');
-        }
-
-        $fp = fopen(__FILE__, 'r');
-
-        if (is_resource($fp) && !flock($fp, LOCK_EX | LOCK_NB)) {
-            throw new WallboxAPIException('Tried to start up but already running. Exiting.');
-        }
-
-        /** @phpstan-ignore-next-line */
-        while (true) {
-            $statusID = (int) $this->getChargerStatusID($id);
-            $sendPush = false;
-            $title = $body = '';
-
-            Log::info('Running in monitor mode...Polling. Current Status: ' . $this->currentStatus . ' Previous Status: ' . $statusID);
-
-            if ($this->currentStatus == 0) {
-                $sendPush = true;
-                $title = 'Wallbox monitoring started';
-                $body = 'The wallbox monitor has just started. The current status is ' . $this->getStatusName($statusID);
-                $this->currentStatus = $statusID;
-            } elseif ($this->currentStatus != $statusID) {
-                $sendPush = true;
-                $title = 'Wallbox Status Change: ' . $this->getStatusName($this->currentStatus) . ' to ' . $this->getStatusName($statusID);
-
-                if ($this->currentStatus == 193 || $this->currentStatus == 194) {
-                    // Log::info('Went from charging to not charging anymore...');
-                    $duration = $this->getLastChargeDuration();
-
-                    $body = 'Total charge time ' . $duration;
-                } elseif ($statusID == 193 || $statusID == 194) {
-                    // Log::info('Went from not charging to charging...');
-                    $body = 'Wallbox now charging...';
-                } else {
-                    // Log::info('Went from not charging to charging...');
-                    $body = 'Status update only...';
-                }
-                $this->currentStatus = $statusID;
-            }
-
-            if ($sendPush) {
-                $this->pushover()->sendPush($title, $body);
-            }
-
-            sleep($seconds);
-        }
     }
 
     /**
