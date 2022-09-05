@@ -153,14 +153,14 @@ class Wallbox
      */
     public $push;
 
-    public $logHandler;
-
     /**
      * ID Of the current status
      *
      * @var int
      */
     private $currentStatus = 0;
+
+    private float $reauthTTL = 0;
 
     /**
      * Default constructor
@@ -182,8 +182,7 @@ class Wallbox
     }
 
     /**
-     * getStatusName
-     * Returns the name of the status associated with the ID
+     * checkFirmwareStatus
      */
     public function checkFirmwareStatus(int $id): string
     {
@@ -200,8 +199,7 @@ class Wallbox
     }
 
     /**
-     * getStatusName
-     * Returns the name of the status associated with the ID
+     * checkLock
      */
     public function checkLock(int $id): bool
     {
@@ -215,6 +213,128 @@ class Wallbox
     protected function getJWTToken(): string
     {
         return $this->p_jwt;
+    }
+
+    /**
+     * getThisMonthUsage
+     */
+    public function getThisMonthUsage(int $id): string
+    {
+        return $this->convertSeconds($this->returnUsageInMinutes($this->getThisMonthData($id)));
+    }
+
+    /**
+     * getLastMonthUsage
+     */
+    public function getLastMonthUsage(int $id): string
+    {
+        return $this->convertSeconds($this->returnUsageInMinutes($this->getLastMonthData($id)));
+    }
+
+    /**
+     * getLastMonthPluggedIn
+     */
+    public function getLastMonthPluggedIn(int $id): string
+    {
+        return $this->convertSeconds($this->returnPluggedInInMinutes($this->getLastMonthData($id)));
+    }
+
+    /**
+     * getThisMonthPluggedIn
+     */
+    public function getThisMonthPluggedIn(int $id): string
+    {
+        return $this->convertSeconds($this->returnPluggedInInMinutes($this->getThisMonthData($id)));
+    }
+
+    /**
+     * getThisMonthCount
+     */
+    public function getThisMonthCount(int $id): int
+    {
+        return count($this->getThisMonthData($id)->data);
+    }
+
+    /**
+     * getThisMonthEnergyUsage
+     */
+    public function getThisMonthEnergyUsage(int $id): float
+    {
+        return $this->returnEnergyUsage($this->getThisMonthData($id));
+    }
+
+    /**
+     * getLastMonthEnergyUsage
+     */
+    public function getLastMonthEnergyUsage(int $id): float
+    {
+        return $this->returnEnergyUsage($this->getLastMonthData($id));
+    }
+
+    /**
+     * getLastMonthCount
+     */
+    public function getLastMonthCount(int $id): int
+    {
+        return count($this->getLastMonthData($id)->data);
+    }
+
+    /**
+     * getThisMonthData
+     */
+    private function getThisMonthData(int $id): \stdClass
+    {
+        return json_decode($this->getStats($id, strtotime('first day of this month midnight', time()), time()));
+    }
+
+    /**
+     * getLastMonthData
+     */
+    private function getLastMonthData(int $id): \stdClass
+    {
+        return json_decode($this->getStats($id, strtotime('first day of last month midnight', time()), strtotime('first day of this month midnight', time())));
+    }
+
+    /**
+     * returnUsageInMinutes
+     */
+    private function returnUsageInMinutes(\stdClass $data): int
+    {
+        $seconds = 0;
+
+        foreach ($data->data as $unit) {
+            $seconds += ($unit->attributes->time);
+        }
+
+        return $seconds;
+    }
+
+    /**
+     * returnEnergyUsage
+     */
+    private function returnEnergyUsage(\stdClass $data): float
+    {
+        $energy = 0;
+
+        foreach ($data->data as $unit) {
+            $energy += ($unit->attributes->energy);
+        }
+
+        return $energy;
+    }
+
+    /**
+     * returnPluggedInInMinutes
+     */
+    private function returnPluggedInInMinutes(\stdClass $data): int
+    {
+        $seconds = 0;
+
+        foreach ($data->data as $unit) {
+            $seconds += ($unit->attributes->end - $unit->attributes->start);
+        }
+
+        return $seconds;
     }
 
     /**
@@ -237,7 +357,7 @@ class Wallbox
     }
 
     /**
-     * getChargerStatus
+     * getFullChargerStatus
      * Returns full data about charger
      */
     public function getFullChargerStatus(int $id): string
@@ -246,7 +366,7 @@ class Wallbox
     }
 
     /**
-     * getChargerStatus
+     * getChargerStatusID
      * Returns full data about charger
      */
     public function getChargerStatusID(int $id): int
@@ -291,16 +411,18 @@ class Wallbox
      */
     private function usernamePasswordAuth(): void
     {
-        $this->p_jwt = json_decode($this->makeAPICall('GET', self::API_LOGIN . self::AUTH_URI, false))->data->attributes->token;
+        $payload = json_decode($this->makeAPICall('GET', self::API_LOGIN . self::AUTH_URI, false));
+        $this->p_jwt = $payload->data->attributes->token;
+        $this->reauthTTL = $payload->data->attributes->ttl;
     }
 
     /**
      * reAuth
      */
-    public function reAuth(): void
-    {
-        $this->usernamePasswordAuth;
-    }
+    // public function reAuth(): void
+    // {
+    //     $this->usernamePasswordAuth();
+    // }
 
     /**
      * getLastChargeDuration
@@ -351,28 +473,14 @@ class Wallbox
     }
 
     /**
-     * pGenRandomString
-     * Generates a random string of $length
-     */
-    public function pGenRandomString(int $length = 6): string
-    {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-
-        for ($i = 0; $i < $length; ++$i) {
-            $randomString .= $characters[mt_rand(0, $charactersLength - 1)];
-        }
-
-        return $randomString;
-    }
-
-    /**
      * makeAPICall
      * Makes the API Call
      */
     public function makeAPICall(string $type, string $url, bool $token = true, string|null $body = null): string
     {
+        if ((floor(microtime(true) * 1000)) > $this->reauthTTL) {
+            // TODO: Probably need a reauth here because your token is no longer valid
+        }
         $data['headers'] = $this->setHeaders($token);
         $data['body'] = $body;
 
@@ -381,7 +489,11 @@ class Wallbox
 
             return $request->getBody()->getContents();
         } catch (RequestException $e) {
-            throw new WallboxAPIRequestException('An error occurred while performing the request to ' . $url);
+            $httpCode = $e->getCode();
+            // TODO: Think about what might happen if the $httpCode is 401.
+            // maybe reauth one time if it's an auth request ($token = false)
+            // Do we start to store timeout?
+            throw new WallboxAPIRequestException('A ' . $httpCode . ' error occurred while performing the request to ' . $url);
         }
     }
 
@@ -398,14 +510,12 @@ class Wallbox
         return $hours > 0 ? "{$hours}h {$minutes}m" : ($minutes > 0 ? "{$minutes}m {$seconds}s" : "{$seconds}s");
     }
 
-
     /**
-     * convertSeconds
-     * Returns a referencd to the logger
+     * monitor
      */
     public function monitor(int $id, int $seconds = 30): void
     {
-
+        /** @phpstan-ignore-next-line */
         while (true) {
             $statusID = (int) $this->getChargerStatusID($id);
             $sendPush = false;
