@@ -14,8 +14,13 @@
 namespace dutchie027\Wallbox;
 
 use dutchie027\Wallbox\Exceptions\WallboxAPIRequestException;
-use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 
 class Wallbox
 {
@@ -25,6 +30,8 @@ class Wallbox
      * @const string
      */
     protected const LIBRARY_VERSION = '1.0.2';
+    protected const MAX_RETRIES = 3;
+    protected bool $failed;
 
     /**
      * Status IDs
@@ -168,7 +175,11 @@ class Wallbox
     public function __construct()
     {
         $this->config = ($this->config instanceof Config && is_object($this->config)) ? $this->config : new Config();
-        $this->guzzle = ($this->guzzle instanceof Guzzle && is_object($this->guzzle)) ? $this->guzzle : new Guzzle();
+
+        $stack = HandlerStack::create();
+        $stack->push(Middleware::retry($this->retryDecider(), $this->retryDelay()));
+
+        $this->guzzle = ($this->guzzle instanceof Client && is_object($this->guzzle)) ? $this->guzzle : new Client(['handler' => $stack]);
         $this->usernamePasswordAuth();
     }
 
@@ -419,10 +430,10 @@ class Wallbox
     /**
      * reAuth
      */
-    // public function reAuth(): void
-    // {
-    //     $this->usernamePasswordAuth();
-    // }
+    public function reAuth(): void
+    {
+        $this->usernamePasswordAuth();
+    }
 
     /**
      * getLastChargeDuration
@@ -490,9 +501,7 @@ class Wallbox
             return $request->getBody()->getContents();
         } catch (RequestException $e) {
             $httpCode = $e->getCode();
-            // TODO: Think about what might happen if the $httpCode is 401.
-            // maybe reauth one time if it's an auth request ($token = false)
-            // Do we start to store timeout?
+
             throw new WallboxAPIRequestException('A ' . $httpCode . ' error occurred while performing the request to ' . $url);
         }
     }
@@ -562,5 +571,47 @@ class Wallbox
     public function pushover(): Push
     {
         return new Push();
+    }
+
+    protected function retryDecider(): callable
+    {
+        return static function (
+            $retries,
+            Request $request,
+            Response $response = null,
+            RequestException $exception = null
+        ) {
+            // Limit the number of retries to MAX_RETRIES
+            if ($retries >= self::MAX_RETRIES) {
+                return false;
+            }
+            // Retry connection exceptions
+            if ($exception instanceof ConnectException) {
+                Log::info('Timeout encountered, retrying');
+
+                return true;
+            }
+
+            if ($response) {
+                // Retry on server errors
+                if ($response->getStatusCode() >= 500) {
+                    Log::info('Server 5xx error encountered, retrying...');
+
+                    return true;
+                }
+            }
+
+            return false;
+        };
+    }
+
+    /**
+     * delay 1s 2s 3s 4s 5s ...
+     */
+    protected function retryDelay(): callable
+    {
+        return static function ($numberOfRetries) {
+            return 1000 * $numberOfRetries;
+        };
     }
 }
