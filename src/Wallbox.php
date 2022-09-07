@@ -29,7 +29,7 @@ class Wallbox
      *
      * @const string
      */
-    protected const LIBRARY_VERSION = '1.0.2';
+    protected const LIBRARY_VERSION = '1.0.4';
     protected const MAX_RETRIES = 3;
     protected bool $failed;
 
