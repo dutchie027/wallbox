@@ -48,11 +48,16 @@
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.8",
         "phpstan/phpstan": "^1.5",
-        "phpunit/phpunit": "^9"
+        "phpunit/phpunit": "^9",
+        "composer/composer": "^2.4"
     },
     "scripts": {
+        "post-install-cmd": [
+            "dutchie027\\Wallbox\\Init\\Setup::generateBlankEnv"
+        ],
         "fix": "./vendor/bin/php-cs-fixer fix",
         "test": "./vendor/bin/phpunit",
+        "genenv": "dutchie027\\Wallbox\\Init\\Setup::generateBlankEnv",
         "stan": "./vendor/bin/phpstan --no-progress",
         "runall": [
             "@fix",

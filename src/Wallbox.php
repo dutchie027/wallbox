@@ -581,11 +581,10 @@ class Wallbox
             Response $response = null,
             RequestException $exception = null
         ) {
-            // Limit the number of retries to MAX_RETRIES
             if ($retries >= self::MAX_RETRIES) {
                 return false;
             }
-            // Retry connection exceptions
+            /** @phpstan-ignore-next-line */
             if ($exception instanceof ConnectException) {
                 Log::info('Timeout encountered, retrying');
 

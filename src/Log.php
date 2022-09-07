@@ -39,10 +39,9 @@ final class Log
         if (!file_exists(Config::getLogDir())) {
             mkdir(Config::getLogDir(), 0700, true);
         }
-
         $logger = new Logger(Config::getLogPrefix());
         /** @phpstan-ignore-next-line */
-        $logger->pushHandler(new StreamHandler(Config::getLogDir() . DIRECTORY_SEPARATOR . Config::getLogPrefix() . date('-Y-m-d') . '.log', Config::getLogLevel()));
+        $logger->pushHandler(new StreamHandler(Config::getLogDir() . DIRECTORY_SEPARATOR . Config::getLogPrefix() . '.log', Config::getLogLevel()));
         self::$instance = $logger;
         self::$is_set = true;
     }
