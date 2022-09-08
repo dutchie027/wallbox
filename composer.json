@@ -49,7 +49,8 @@
         "friendsofphp/php-cs-fixer": "^3.8",
         "phpstan/phpstan": "^1.5",
         "phpunit/phpunit": "^9",
-        "composer/composer": "^2.4"
+        "composer/composer": "^2.4",
+        "psalm/phar": "^4.27"
     },
     "scripts": {
         "post-install-cmd": [
@@ -59,6 +60,7 @@
         "test": "./vendor/bin/phpunit",
         "genenv": "dutchie027\\Wallbox\\Init\\Setup::generateBlankEnv",
         "stan": "./vendor/bin/phpstan --no-progress",
+        "psalm": "./vendor/bin/psalm.phar --show-info=true",
         "runall": [
             "@fix",
             "@test",
