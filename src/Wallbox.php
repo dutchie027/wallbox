@@ -544,7 +544,7 @@ class Wallbox
         Log::info('Monitor() has been called. This will put the script in an infinite loop.');
         /** @phpstan-ignore-next-line */
         while (true) {
-            $statusID = (int) $this->getChargerStatusID($id);
+            $statusID = $this->getChargerStatusID($id);
             $sendPush = false;
             $title = $body = '';
 
@@ -595,11 +595,11 @@ class Wallbox
     protected function retryDecider(): callable
     {
         return static function (
-            $retries,
+            int $retries,
             Request $request,
             Response $response = null,
             RequestException $exception = null
-        ) {
+        ): bool {
             if ($retries >= self::MAX_RETRIES) {
                 return false;
             }
@@ -628,7 +628,7 @@ class Wallbox
      */
     protected function retryDelay(): callable
     {
-        return static function ($numberOfRetries) {
+        return static function (int $numberOfRetries): int {
             return 1000 * $numberOfRetries;
         };
     }
