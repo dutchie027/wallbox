@@ -174,12 +174,12 @@ class Wallbox
      */
     public function __construct()
     {
-        $this->config = ($this->config instanceof Config && is_object($this->config)) ? $this->config : new Config();
+        $this->config = new Config();
 
         $stack = HandlerStack::create();
         $stack->push(Middleware::retry($this->retryDecider(), $this->retryDelay()));
 
-        $this->guzzle = ($this->guzzle instanceof Client && is_object($this->guzzle)) ? $this->guzzle : new Client(['handler' => $stack]);
+        $this->guzzle = new Client(['handler' => $stack]);
         $this->usernamePasswordAuth();
     }
 
