@@ -235,6 +235,14 @@ class Wallbox
     }
 
     /**
+     * getSevenDaysUsage
+     */
+    public function getSevenDaysUsage(int $id): string
+    {
+        return $this->convertSeconds($this->returnUsageInMinutes($this->getLastSevenDaysData($id)));
+    }
+
+    /**
      * getLastMonthUsage
      */
     public function getLastMonthUsage(int $id): string
@@ -304,6 +312,14 @@ class Wallbox
     private function getLastMonthData(int $id): \stdClass
     {
         return json_decode($this->getStats($id, strtotime('first day of last month midnight', time()), strtotime('first day of this month midnight', time())));
+    }
+
+    /**
+     * getLastSevenDaysData
+     */
+    private function getLastSevenDaysData(int $id): \stdClass
+    {
+        return json_decode($this->getStats($id, strtotime('-8 days midnight', time()), strtotime('-1 day midnight', time())));
     }
 
     /**
@@ -501,6 +517,7 @@ class Wallbox
             return $request->getBody()->getContents();
         } catch (RequestException $e) {
             $httpCode = $e->getCode();
+            Log::error('A ' . $httpCode . ' error occurred while performing the request to ' . $url);
 
             throw new WallboxAPIRequestException('A ' . $httpCode . ' error occurred while performing the request to ' . $url);
         }
@@ -524,13 +541,14 @@ class Wallbox
      */
     public function monitor(int $id, int $seconds = 30): void
     {
+        Log::info('Monitor() has been called. This will put the script in an infinite loop.');
         /** @phpstan-ignore-next-line */
         while (true) {
             $statusID = (int) $this->getChargerStatusID($id);
             $sendPush = false;
             $title = $body = '';
 
-            Log::info('Running in monitor mode...Polling. Current Status: ' . $this->currentStatus . ' Previous Status: ' . $statusID);
+            Log::debug('Running in monitor mode...Polling. Current Status: ' . $this->currentStatus . ' Previous Status: ' . $statusID);
 
             if ($this->currentStatus == 0) {
                 $sendPush = true;
@@ -542,21 +560,22 @@ class Wallbox
                 $title = 'Wallbox Status Change: ' . $this->getStatusName($this->currentStatus) . ' to ' . $this->getStatusName($statusID);
 
                 if ($this->currentStatus == 193 || $this->currentStatus == 194) {
-                    // Log::info('Went from charging to not charging anymore...');
+                    Log::debug('Went from charging to not charging anymore...');
                     $duration = $this->getLastChargeDuration();
 
                     $body = 'Total charge time ' . $duration;
                 } elseif ($statusID == 193 || $statusID == 194) {
-                    // Log::info('Went from not charging to charging...');
+                    Log::debug('Went from not charging to charging...');
                     $body = 'Wallbox now charging...';
                 } else {
-                    // Log::info('Went from not charging to charging...');
+                    Log::debug('Status change...');
                     $body = 'Status update only...';
                 }
                 $this->currentStatus = $statusID;
             }
 
             if ($sendPush) {
+                Log::info('Sending push - ' . $title . '  - ' . $body);
                 $this->pushover()->sendPush($title, $body);
             }
 
@@ -586,7 +605,7 @@ class Wallbox
             }
             /** @phpstan-ignore-next-line */
             if ($exception instanceof ConnectException) {
-                Log::info('Timeout encountered, retrying');
+                Log::warning('Timeout encountered, retrying');
 
                 return true;
             }
@@ -594,7 +613,7 @@ class Wallbox
             if ($response) {
                 // Retry on server errors
                 if ($response->getStatusCode() >= 500) {
-                    Log::info('Server 5xx error encountered, retrying...');
+                    Log::warning('Server 5xx error encountered, retrying...');
 
                     return true;
                 }
