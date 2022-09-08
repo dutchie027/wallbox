@@ -172,9 +172,9 @@ class Wallbox
     /**
      * Default constructor
      */
-    public function __construct()
+    public function __construct(string $configLoc = null)
     {
-        $this->config = new Config();
+        $this->config = null === $configLoc ? new Config() : new Config($configLoc);
 
         $stack = HandlerStack::create();
         $stack->push(Middleware::retry($this->retryDecider(), $this->retryDelay()));

@@ -25,8 +25,8 @@ class Push
      */
     public function __construct()
     {
-        $this->poApp = new \Serhiy\Pushover\Application($_ENV['PUSHOVER_APP']);
-        $this->poUser = new \Serhiy\Pushover\Recipient($_ENV['PUSHOVER_USER']);
+        $this->poApp = new \Serhiy\Pushover\Application(Config::getPushApp());
+        $this->poUser = new \Serhiy\Pushover\Recipient(Config::getPushUser());
     }
 
     public function sendPush(string $title, string $body): void

@@ -8,26 +8,48 @@ use Composer\Script\Event;
 
 class Setup
 {
-    private const ENV_VALS = [
+    private const API_KVPS = [
         'API_USERNAME',
         'API_PASSWORD',
-        'TIMEOUT_SECONDS',
-        'PUSHOVER_APP',
-        'PUSHOVER_USER',
+    ];
+
+    private const LOG_KVPS = [
         'LOG_PREFIX',
         'LOG_LEVEL',
         'LOG_DIR',
     ];
 
-    public static function generateBlankEnv(Event $event): void
+    private const PUSH_KVPS = [
+        'PUSHOVER_APP',
+        'PUSHOVER_USER',
+    ];
+
+    private const SERVICE_KVPS = [
+        'TIMEOUT_SECONDS',
+    ];
+
+    private const KVP_SECTIONS = [
+        'api',
+        'service',
+        'push',
+        'log'
+    ];
+
+    public static function generateBlankIni(Event $event): void
     {
         $config = $event->getComposer()->getConfig()->get('vendor-dir');
-        $envFile = dirname($config) . '/.env.sample';
+        $envFile = dirname($config) . '/wallbox.ini';
         $myfile = fopen($envFile, 'w') or die('Unable to open file!');
 
-        foreach (self::ENV_VALS as $key) {
-            $line = $key . '=""' . PHP_EOL;
-            fwrite($myfile, $line);
+        foreach (self::KVP_SECTIONS as $key) {
+
+            $header = '[' . $key . ']' . PHP_EOL;
+            fwrite($myfile, $header);
+            foreach (constant('self::' . strtoupper($key) . '_KVPS') as $kvp) {
+                $line = $kvp . '=' . PHP_EOL;
+                fwrite($myfile, $line);
+            }
+            fwrite($myfile, PHP_EOL);
         }
         fclose($myfile);
     }

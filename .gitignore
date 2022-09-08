@@ -4,6 +4,7 @@
 /.build/
 .php-cs-fixer.cache
 composer.lock
-.env
+config.ini
+wallbox.ini
 test.php
 service.php

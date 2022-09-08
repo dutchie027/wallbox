@@ -22,7 +22,6 @@
         "php": ">=8.1",
         "monolog/monolog": "^3.0",
         "guzzlehttp/guzzle": "^7.5",
-        "vlucas/phpdotenv": "^5.4",
         "serhiy/pushover": "^1.1"
     },
     "minimum-stability": "dev",
@@ -54,11 +53,11 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "dutchie027\\Wallbox\\Init\\Setup::generateBlankEnv"
+            "dutchie027\\Wallbox\\Init\\Setup::generateBlankIni"
         ],
         "fix": "./vendor/bin/php-cs-fixer fix",
         "test": "./vendor/bin/phpunit",
-        "genenv": "dutchie027\\Wallbox\\Init\\Setup::generateBlankEnv",
+        "genini": "dutchie027\\Wallbox\\Init\\Setup::generateBlankIni",
         "stan": "./vendor/bin/phpstan --no-progress",
         "psalm": "./vendor/bin/psalm.phar --show-info=true",
         "runall": [
