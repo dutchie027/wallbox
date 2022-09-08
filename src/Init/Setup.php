@@ -32,7 +32,7 @@ class Setup
         'api',
         'service',
         'push',
-        'log'
+        'log',
     ];
 
     public static function generateBlankIni(Event $event): void
@@ -42,9 +42,9 @@ class Setup
         $myfile = fopen($envFile, 'w') or die('Unable to open file!');
 
         foreach (self::KVP_SECTIONS as $key) {
-
             $header = '[' . $key . ']' . PHP_EOL;
             fwrite($myfile, $header);
+
             foreach (constant('self::' . strtoupper($key) . '_KVPS') as $kvp) {
                 $line = $kvp . '=' . PHP_EOL;
                 fwrite($myfile, $line);

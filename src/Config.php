@@ -15,6 +15,8 @@ class Config
 
     private static int $s_log_level;
 
+    private static int $s_monitor_timer;
+
     private static string $s_log_prefix;
 
     private static string $s_push_user;
@@ -24,22 +26,25 @@ class Config
     private string $token;
 
     /**
+     * @var array<string,array<string>>
+     */
+    private $ini_data;
+
+    /**
      * Default Constructor - Initialize Values
      */
     public function __construct(string $loc = 'wallbox.ini')
     {
-        $stack = debug_backtrace();
-        $firstFrame = $stack[count($stack) - 1];
-        $scriptDir = dirname($firstFrame['file']);
-        $file = is_file($loc) ? $loc : $scriptDir . "/" . $loc;
+        $file = is_file($loc) ? $loc : dirname(debug_backtrace()[0]['file']) . '/' . $loc;
         $this->ini_data = $this->returnIniArray($file);
-        $tokenString = $this->returnContents('api/API_USERNAME', 'user') . ':' . $this->returnContents('api/API_PASSWORD', 'password');
+        $tokenString = $this->returnStringFromIni('api/API_USERNAME', 'user') . ':' . $this->returnStringFromIni('api/API_PASSWORD', 'password');
         $this->token = base64_encode($tokenString);
-        self::$s_log_dir = $this->returnContents('log/LOG_DIR', sys_get_temp_dir());
-        self::$s_log_prefix = $this->returnContents('log/LOG_PREFIX', 'wallbox');
-        self::$s_log_level = $this->returnLogLevel('log/LOG_LEVEL', 100);
-        self::$s_push_user = $this->returnContents('push/PUSHOVER_USER', '');
-        self::$s_push_app = $this->returnContents('push/PUSHOVER_APP', '');
+        self::$s_log_dir = $this->returnStringFromIni('log/LOG_DIR', sys_get_temp_dir());
+        self::$s_log_prefix = $this->returnStringFromIni('log/LOG_PREFIX', 'wallbox');
+        self::$s_log_level = $this->returnIntFromIni('log/LOG_LEVEL', 100);
+        self::$s_monitor_timer = $this->returnIntFromIni('service/TIMEOUT_SECONDS', 60);
+        self::$s_push_user = $this->returnStringFromIni('push/PUSHOVER_USER', '');
+        self::$s_push_app = $this->returnStringFromIni('push/PUSHOVER_APP', '');
     }
 
     public function getToken(): string
@@ -82,6 +87,14 @@ class Config
     /**
      * Returns Log Prefix
      */
+    public static function getServiceTimeout(): int
+    {
+        return self::$s_monitor_timer;
+    }
+
+    /**
+     * Returns Log Prefix
+     */
     public static function getPushApp(): string
     {
         return self::$s_push_app;
@@ -108,18 +121,20 @@ class Config
     /**
      * Used to set values from .ini array or default value
      */
-    private function returnContents(string $var, string $dv): string
+    private function returnStringFromIni(string $var, string $dv): string
     {
         [$root, $key] = explode('/', $var);
+
         return (isset($this->ini_data[$root][$key])) ? $this->ini_data[$root][$key] : $dv;
     }
 
     /**
      * Used to set values from .ini array or default value
      */
-    private function returnLogLevel(string $var, int $dv): int
+    private function returnIntFromIni(string $var, int $dv): int
     {
         [$root, $key] = explode('/', $var);
+
         return ((isset($this->ini_data[$root][$key])) && (in_array((int) $this->ini_data[$root][$key], self::ALLOWED_LEVELS, true))) ? (int) $this->ini_data[$root][$key] : $dv;
     }
 }

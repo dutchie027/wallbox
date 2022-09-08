@@ -542,7 +542,6 @@ class Wallbox
     public function monitor(int $id, int $seconds = 30): void
     {
         Log::info('Monitor() has been called. This will put the script in an infinite loop.');
-        /** @phpstan-ignore-next-line */
         while (true) {
             $statusID = $this->getChargerStatusID($id);
             $sendPush = false;
@@ -579,7 +578,7 @@ class Wallbox
                 $this->pushover()->sendPush($title, $body);
             }
 
-            sleep($seconds);
+            sleep(Config::getServiceTimeout());
         }
     }
 
@@ -603,7 +602,6 @@ class Wallbox
             if ($retries >= self::MAX_RETRIES) {
                 return false;
             }
-            /** @phpstan-ignore-next-line */
             if ($exception instanceof ConnectException) {
                 Log::warning('Timeout encountered, retrying');
 

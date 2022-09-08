@@ -4,3 +4,16 @@ parameters:
     paths:
         - ./src
         - ./tests
+    ignoreErrors:
+        -
+            message: '#Constant dutchie027\\Wallbox\\Init\\Setup::.* is unused.#'
+            path: src/Init/Setup.php
+        -
+            message: '#Offset.*#'
+            path: src/Config.php
+        -
+            message: '#While loop condition is always true.#'
+            path: src/Wallbox.php
+        -
+            message: '#Instanceof between GuzzleHttp\\Exception\\RequestException\|null and GuzzleHttp\\Exception\\ConnectException will always evaluate to false.#'
+            path: src/Wallbox.php
