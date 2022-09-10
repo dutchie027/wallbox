@@ -70,6 +70,7 @@
         "test": "Runs phpunit tests",
         "fix": "Runs PHP-CS Fixer",
         "stan": "Runs phpstan to check standards",
-        "runall": "Runs all tests (fixer, phpunit, phpstan)"
+        "runall": "Runs all tests (fixer, phpunit, phpstan)",
+        "genini": "Generates the default .ini file"
     }
 }
