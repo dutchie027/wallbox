@@ -15,7 +15,7 @@ To start, simply download the package using composer:
 composer require dutchie027/wallbox
 ```
 
-After downloading it with composer, rename `.env.sample` to `.env` and add your specific variables and credentials.
+After downloading it with composer, open `wallbox.ini` and enter your variables and credentials.
 
 Once you have all of that, depending on how you want to use it, create a simple PHP file that calls the library:
 
@@ -24,9 +24,6 @@ Once you have all of that, depending on how you want to use it, create a simple 
 <?php
 
 include_once 'vendor/autoload.php';
-
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->safeLoad();
 
 $wallbox = new dutchie027\Wallbox\Wallbox();
 ...
@@ -41,9 +38,6 @@ The most common use case for the script(s) are a monitoring system. To accomplis
 <?php
 
 include_once 'vendor/autoload.php';
-
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->safeLoad();
 
 $wallbox = new dutchie027\Wallbox\Wallbox();
 $wallbox->monitor();
@@ -151,7 +145,6 @@ The code uses a few external libraries, but they're all bundled in the composer.
 
 * monolog/monolog
 * guzzlehttp/guzzle
-* vlucas/phpdotenv
 * serhiy/pushover
 
 ## Acknowledgements
