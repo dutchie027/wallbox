@@ -3,7 +3,7 @@
 /**
  * PHP Wrapper to Interact with Wallbox API
  *
- * @version 1.0.2
+ * @version 1.1.1
  *
  * @license http://www.opensource.org/licenses/mit-license.php MIT
  *
@@ -29,7 +29,7 @@ class Wallbox
      *
      * @const string
      */
-    protected const LIBRARY_VERSION = '1.1.0';
+    protected const LIBRARY_VERSION = '1.1.1';
     protected const MAX_RETRIES = 3;
     protected bool $failed;
 
