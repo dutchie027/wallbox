@@ -38,7 +38,7 @@ class Setup
     public static function generateBlankIni(Event $event): void
     {
         $config = $event->getComposer()->getConfig()->get('vendor-dir');
-        $envFile = dirname($config) . '/wallbox.ini';
+        $envFile = dirname($config) . DIRECTORY_SEPARATOR . 'wallbox.ini';
         $myfile = fopen($envFile, 'w') or die('Unable to open file!');
 
         foreach (self::KVP_SECTIONS as $key) {

@@ -23,7 +23,7 @@ final class ConfigTest extends TestCase
     {
         $this->tmp_ini = tempnam(sys_get_temp_dir(), 'phpunit') ?: sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'php-unit';
         $handle = fopen($this->tmp_ini, 'w');
-
+        $tempDir = sys_get_temp_dir();
         if ($handle) {
             fwrite($handle, '[api]' . PHP_EOL);
             fwrite($handle, 'API_USERNAME="wallbox"' . PHP_EOL);
@@ -36,26 +36,26 @@ final class ConfigTest extends TestCase
             fwrite($handle, '[log]' . PHP_EOL);
             fwrite($handle, 'LOG_PREFIX="wallbox"' . PHP_EOL);
             fwrite($handle, 'LOG_LEVEL=100' . PHP_EOL);
-            fwrite($handle, 'LOG_DIR="/var/log"' . PHP_EOL);
+            fwrite($handle, 'LOG_DIR="' . $tempDir . '"' . PHP_EOL);
             fclose($handle);
         }
 
-        $this->config = new Config();
+        $this->config = new Config($this->tmp_ini);
     }
 
     public function testgetToken(): void
     {
-        self::assertEquals('dXNlcjpwYXNzd29yZA==', $this->config->getToken());
+        self::assertEquals('d2FsbGJveDpwYXNzd29yZA==', $this->config->getToken());
     }
 
     public function testgetPushApp(): void
     {
-        self::assertEquals('', $this->config->getPushApp());
+        self::assertEquals('appkey', $this->config->getPushApp());
     }
 
     public function testgetPushUser(): void
     {
-        self::assertEquals('', $this->config->getPushUser());
+        self::assertEquals('userkey', $this->config->getPushUser());
     }
 
     public function testgetLogDir(): void

@@ -35,7 +35,7 @@ class Config
      */
     public function __construct(string $loc = 'wallbox.ini')
     {
-        $file = is_file($loc) ? $loc : dirname(debug_backtrace()[0]['file']) . '/' . $loc;
+        $file = is_file($loc) ? $loc : dirname(debug_backtrace()[0]['file']) . DIRECTORY_SEPARATOR . $loc;
         $this->ini_data = $this->returnIniArray($file);
         $tokenString = $this->returnStringFromIni('api/API_USERNAME', 'user') . ':' . $this->returnStringFromIni('api/API_PASSWORD', 'password');
         $this->token = base64_encode($tokenString);
