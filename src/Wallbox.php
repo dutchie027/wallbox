@@ -505,9 +505,6 @@ class Wallbox
      */
     public function makeAPICall(string $type, string $url, bool $token = true, string|null $body = null): string
     {
-        if ((floor(microtime(true) * 1000)) > $this->reauthTTL) {
-            // TODO: Probably need a reauth here because your token is no longer valid
-        }
         $data['headers'] = $this->setHeaders($token);
         $data['body'] = $body;
 

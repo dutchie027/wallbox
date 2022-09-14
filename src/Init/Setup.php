@@ -35,6 +35,8 @@ class Setup
         'log',
     ];
 
+    private static $iniFile;
+
     public static function generateBlankIni(Event $event): void
     {
         $config = $event->getComposer()->getConfig()->get('vendor-dir');
@@ -52,5 +54,14 @@ class Setup
             fwrite($myfile, PHP_EOL);
         }
         fclose($myfile);
+        self::$iniFile = $envFile;
+    }
+
+    /**
+     * Method to return the Monolog instance
+     */
+    public static function getFileLocation(): string
+    {
+        return self::$iniFile;
     }
 }
