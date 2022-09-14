@@ -3,7 +3,6 @@
 /resources/
 /.build/
 .php-cs-fixer.cache
-composer.lock
 config.ini
 wallbox.ini
 test.php
