@@ -51,6 +51,5 @@ jobs:
         run: |
           vendor/bin/phpunit --coverage-clover=.build/logs/clover.xml
 
-      - name: Send code coverage report to codecov.io
-        run: |
-          bash <(curl -s https://codecov.io/bash)
+      - name: Upload coverage reports to Codecov with GitHub Action
+        uses: codecov/codecov-action@v3
