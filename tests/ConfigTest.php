@@ -24,6 +24,7 @@ final class ConfigTest extends TestCase
         $this->tmp_ini = tempnam(sys_get_temp_dir(), 'phpunit') ?: sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'php-unit';
         $handle = fopen($this->tmp_ini, 'w');
         $tempDir = sys_get_temp_dir();
+
         if ($handle) {
             fwrite($handle, '[api]' . PHP_EOL);
             fwrite($handle, 'API_USERNAME="wallbox"' . PHP_EOL);

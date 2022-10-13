@@ -235,6 +235,14 @@ class Wallbox
     }
 
     /**
+     * getThisYearUsage
+     */
+    public function getThisYearUsage(int $id): string
+    {
+        return $this->convertSeconds($this->returnUsageInMinutes($this->getThisYearData($id)));
+    }
+
+    /**
      * getSevenDaysUsage
      */
     public function getSevenDaysUsage(int $id): string
@@ -320,6 +328,14 @@ class Wallbox
     private function getLastSevenDaysData(int $id): \stdClass
     {
         return json_decode($this->getStats($id, strtotime('-8 days midnight', time()), strtotime('-1 day midnight', time())));
+    }
+
+    /**
+     * getThisYearData
+     */
+    private function getThisYearData(int $id): \stdClass
+    {
+        return json_decode($this->getStats($id, strtotime('1/1/' . date('Y'), time()), strtotime('12/31/' . date('Y'), time())));
     }
 
     /**
