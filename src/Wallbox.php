@@ -299,6 +299,14 @@ class Wallbox
     }
 
     /**
+     * getThisYearEnergyUsage
+     */
+    public function getThisYearEnergyUsage(int $id): float
+    {
+        return $this->returnEnergyUsage($this->getThisYearData($id));
+    }
+
+    /**
      * getLastMonthCount
      */
     public function getLastMonthCount(int $id): int
