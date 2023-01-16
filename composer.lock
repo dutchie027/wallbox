@@ -694,22 +694,22 @@
         },
         {
             "name": "serhiy/pushover",
-            "version": "v1.2.0",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/slunak/pushover-php.git",
-                "reference": "ef20814d937a62f67d5ad37a948233075d79c6d8"
+                "reference": "de3a75b78071771adf663ad59736ceabc752290a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/slunak/pushover-php/zipball/ef20814d937a62f67d5ad37a948233075d79c6d8",
-                "reference": "ef20814d937a62f67d5ad37a948233075d79c6d8",
+                "url": "https://api.github.com/repos/slunak/pushover-php/zipball/de3a75b78071771adf663ad59736ceabc752290a",
+                "reference": "de3a75b78071771adf663ad59736ceabc752290a",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-json": "*",
-                "php": ">=7.1"
+                "php": ">=7.4"
             },
             "require-dev": {
                 "phpunit/phpunit": "*"
@@ -741,9 +741,9 @@
             ],
             "support": {
                 "issues": "https://github.com/slunak/pushover-php/issues",
-                "source": "https://github.com/slunak/pushover-php/tree/v1.2.0"
+                "source": "https://github.com/slunak/pushover-php/tree/v1.3.0"
             },
-            "time": "2021-08-02T12:16:11+00:00"
+            "time": "2022-12-31T09:48:55+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
