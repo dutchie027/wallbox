@@ -49,7 +49,7 @@
         "phpstan/phpstan": "^1.5",
         "phpunit/phpunit": "^9",
         "composer/composer": "^2.4",
-        "psalm/phar": "^4.27"
+        "psalm/phar": "^5.5"
     },
     "scripts": {
         "post-install-cmd": [
